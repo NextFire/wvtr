@@ -63,10 +63,10 @@ func LaunchExpedition(user *data.User, expedition *data.ExpeditionDB) {
 	if user.UserIsHome() && !user.UserHasAProblem() {
 		user.State.CurrentExpedition = expedition
 		user.State.State = expedition.WhatHappened[0].StepState
-		if user.State.State == data.Fight {
-			glTeam := gamedata.GetEnemyTeamForEvent(expedition.Identifier, 0)
-			user.State.ETeam = (*data.Team)(glTeam)
-		}
+		// if user.State.State == data.Fight {
+		// 	glTeam := gamedata.GetEnemyTeamForEvent(expedition.Identifier, 0)
+		// 	user.State.ETeam = (*data.Team)(glTeam)
+		// }
 		UpdateGameState(user.State)
 	} else {
 		logger.ErrLog.Printf("requested to launch an expedition on user %s but user is [state: %s].", user.Name, user.State.State)
@@ -81,7 +81,7 @@ func InsertSkillsInDB() {
 		return
 	}
 	logger.DumpLog.Println("Insert skills in db")
-	for _, s := range data.GetSkills() {
+	for _, s := range gamedata.GetSkills() {
 		CreateSkill(s)
 	}
 }
@@ -94,7 +94,7 @@ func InsertHeroClassesInDB() {
 		return
 	}
 	logger.DumpLog.Println("Insert hero classes in db")
-	for _, s := range data.GetHeroClasses() {
-		CreateHeroClasse(s)
+	for _, s := range gamedata.GetHeroClasses() {
+		CreateHeroClass(s)
 	}
 }

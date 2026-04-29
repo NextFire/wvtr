@@ -8,14 +8,20 @@ func UpdateTeam(user *data.User) {
 		Replace(user.CurrentTeam.Heroes)
 }
 
+func GetTeam(team *data.Team) *data.Team {
+	db.Preload("Heroes").
+		Find(&team)
+	return team
+}
+
 func GetTeamByID(id uint) *data.Team {
 	var res *data.Team
 	db.Preload("Heroes").
-		Preload("Heroes.Class").
-		Preload("Heroes.UniqueSkill").
-		Preload("Heroes.ActiveSkill").
-		Preload("Heroes.Attributes").
-		Preload("Team").
 		Find(&res, id)
+
+	for i := range res.Heroes {
+		res.Heroes[i] = GetHeroByID(res.Heroes[i].ID)
+	}
+
 	return res
 }

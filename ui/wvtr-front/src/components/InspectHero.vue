@@ -28,6 +28,7 @@ import type { Hero } from "../model/types.ts"
                 </div>
                 </div>
                 <div>
+                    <label>Attributes:</label>
                     <div>Strength ({{ hero.attributes.sgt.toFixed(2) }}) : {{ hero.attributes.strength }}</div>
                     <div>Intelligence ({{ hero.attributes.igt.toFixed(2) }}) : {{ hero.attributes.intelligence }}</div>
                     <div>Dexterity ({{ hero.attributes.dgt.toFixed(2) }}) : {{ hero.attributes.dexterity }}</div>
@@ -35,12 +36,28 @@ import type { Hero } from "../model/types.ts"
                 </div>
                 <div>
                     <div>Resitances :</div>
-                    <div>Blunt : {{ hero.attributes.blunt }}</div>
-                    <div>Pierce : {{ hero.attributes.pierce }}</div>
-                    <div>Slash : {{ hero.attributes.slash }}</div>
-                    <div>Fire : {{ hero.attributes.fire }}</div>
-                    <div>Frost : {{ hero.attributes.frost }}</div>
-                    <div>Lightning : {{ hero.attributes.lighting }}</div>
+                    <div class="row" style="gap: 10px;">
+                        <div>
+                            <div>Blunt:</div>
+                            <div>Pierce:</div>
+                            <div>Slash:</div>
+                        </div>
+                        <div>
+                            <div>{{ hero.attributes.blunt }}</div>
+                            <div>{{ hero.attributes.pierce }}</div>
+                            <div>{{ hero.attributes.slash }}</div>
+                        </div>
+                        <div>
+                            <div>Fire:</div>
+                            <div>Frost:</div>
+                            <div>Lightning:</div>
+                        </div>
+                        <div>
+                            <div>{{ hero.attributes.fire }}</div>
+                            <div>{{ hero.attributes.frost }}</div>
+                            <div>{{ hero.attributes.lighting }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="column">

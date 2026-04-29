@@ -23,7 +23,7 @@
         if (!answer.value) {
             return
         }
-        var countDownDate = Date.parse(answer.value.stepEndAt);
+        var countDownDate = Date.parse(answer.value!.timeline[answer.value!.timeline!.length-1]!.when);
         // Get today's date and time
         var now = new Date().getTime();
 
@@ -45,9 +45,10 @@
 
     function launchTimer() {
         console.log(props.user)
-        if (answer.value && answer.value.stepEndAt) {
+        let endAt = answer.value!.timeline[answer.value!.timeline!.length-1]!.when
+        if (endAt) {
             console.log(answer.value)
-            console.log(answer.value.stepEndAt)
+            console.log(endAt)
             
             //console.log(props.user)
             // Update the count down every 1 second

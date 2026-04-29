@@ -1,7 +1,6 @@
 package databasecontroller
 
 import (
-	"fmt"
 	"wvtrserv/data"
 	"wvtrserv/logger"
 )
@@ -12,16 +11,34 @@ func CreateHero(hero *data.Hero) error {
 	return tx.Error
 }
 
-func GetHeroByID(id uint) data.Hero {
-	var res data.Hero
-	db.Preload("HeroClass").
+func GetHeroByID(id uint) *data.Hero {
+	var res *data.Hero
+	db.Preload("Class").
 		Preload("Attributes").
 		Preload("Class").
+		Preload("WeaponAttack").
 		Preload("UniqueSkill").
 		Preload("ActiveSkill").
-		Preload("Team").
-		Preload("Hero").
+		Preload("Equipment").
 		Find(&res, id)
-	fmt.Printf("Got hero by ID: %d\n", id)
+
+	if res.Class != nil {
+		res.Class = GetHeroClassByID(res.Class.ID)
+	}
+	if res.Attributes != nil {
+		res.Attributes = GetHeroAttributesByID(res.Attributes.ID)
+	}
+	if res.WeaponAttack != nil {
+		res.WeaponAttack = GetSkillByID(res.WeaponAttack.ID)
+	}
+	if res.UniqueSkill != nil {
+		res.UniqueSkill = GetSkillByID(res.UniqueSkill.ID)
+	}
+	if res.ActiveSkill != nil {
+		res.ActiveSkill = GetSkillByID(res.ActiveSkill.ID)
+	}
+	if res.Equipment != nil {
+		res.Equipment = GetHeroEquipmentByID(res.Equipment.ID)
+	}
 	return res
 }

@@ -91,7 +91,7 @@ func (a HeroAttributes) GetFrostRes() float64 {
 }
 
 func (a HeroAttributes) GetLightingRes() float64 {
-	return a.Lighting
+	return a.Lightning
 }
 
 func (a HeroAttributes) GetAttributesArray() []float64 {
@@ -111,6 +111,18 @@ func (a HeroAttributes) GetGRArray() []float64 {
 	res[IgtID] = a.Igt
 	res[DgtID] = a.Dgt
 	res[LgtID] = a.Lgt
+	return res
+}
+
+func (a HeroAttributes) GetResArray() []float64 {
+	res := make([]float64, 6)
+	res[Blunt] = a.Blunt
+	res[Slash] = a.Slash
+	res[Pierce] = a.Pierce
+	res[Fire] = a.Fire
+	res[Frost] = a.Frost
+	res[Lightning] = a.Lightning
+
 	return res
 }
 

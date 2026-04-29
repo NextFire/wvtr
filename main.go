@@ -1,5 +1,7 @@
 package main
 
+//TODO: Make DB controller better stp
+
 import (
 	"encoding/json"
 	"fmt"
@@ -12,7 +14,7 @@ import (
 	"wvtrserv/data"
 	"wvtrserv/databasecontroller"
 	"wvtrserv/gamedata"
-	"wvtrserv/gamelogic/hero"
+	"wvtrserv/gamelogic/expedition"
 	"wvtrserv/logger"
 	"wvtrserv/nanapi/client"
 	"wvtrserv/utils"
@@ -121,6 +123,7 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := databasecontroller.GetUserByDiscordID(discordAccount.DiscordID)
+	user = databasecontroller.GetUserGameState(user)
 
 	// this means it's the first time the user arrive here.
 	// and we need to create a new user based on the discord account info
@@ -194,7 +197,7 @@ func handlerCreateHeroForPlayer(w http.ResponseWriter, r *http.Request) {
 
 	logger.DumpLog.Println(waifu)
 
-	newH := hero.CreateNewHeroFromDBWaifuInfos(waifu)
+	newH := gamedata.CreateNewHeroFromDBWaifuInfos(waifu, databasecontroller.GetHeroClasses(), databasecontroller.GetSkills())
 	newH.UserID = uint(id)
 
 	errReq := databasecontroller.CreateHero(newH)
@@ -392,8 +395,8 @@ func handlerLaunchExpedition(w http.ResponseWriter, r *http.Request) {
 	expIdentifier := r.PathValue("expId")
 
 	user := databasecontroller.GetUserByID(uint(id))
-
-	databasecontroller.LaunchExpedition(user, gamedata.Expeditions[expIdentifier].Solve(expIdentifier, user.CurrentTeam))
+	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier]
+	databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam))
 	b, err := json.Marshal(user.State.CurrentExpedition.WhatHappened[0])
 	if err != nil {
 		logger.ErrLog.Println(err)
@@ -439,7 +442,66 @@ func main() {
 
 	logger.DumpLog.Println("Listening on :4210...")
 	err := http.ListenAndServe(":4210", nil)
+
+	// testing std input
+	var i int
+
+	logger.DumpLog.Print("Type a number: ")
+	fmt.Scan(&i)
+	logger.DumpLog.Println("Your number is:", i)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
+// test
+// func main() {
+// 	databasecontroller.DBLogIn()
+
+// 	testH1 := &client.JoinWC{
+// 		NameUserPreferred: "testH1",
+// 		Rank:              "S",
+// 	}
+
+// 	testH2 := &client.JoinWC{
+// 		NameUserPreferred: "testH2",
+// 		Rank:              "S",
+// 	}
+
+// 	testH3 := &client.JoinWC{
+// 		NameUserPreferred: "testH3",
+// 		Rank:              "S",
+// 	}
+
+// 	classes := databasecontroller.GetHeroClasses()
+// 	skills := databasecontroller.GetSkills()
+
+// 	H1 := gamedata.CreateNewHeroFromDBWaifuInfos(testH1, classes, skills)
+// 	H1.Equipment.Weapon = data.CreateWeapon(gamedata.SwordBase)
+
+// 	H2 := gamedata.CreateNewHeroFromDBWaifuInfos(testH2, classes, skills)
+// 	H2.Equipment.Weapon = data.CreateWeapon(gamedata.DaggerBase)
+
+// 	H3 := gamedata.CreateNewHeroFromDBWaifuInfos(testH3, classes, skills)
+// 	H3.Equipment.Weapon = data.CreateWeapon(gamedata.HammerBase)
+
+// 	HTeam := &data.Team{
+// 		Heroes: []*data.Hero{H1, H2, H3},
+// 	}
+
+// 	ETeam := &data.Team{
+// 		Heroes: []*data.Hero{gamedata.RedSlime, gamedata.BlueSlime, gamedata.GreenSlime},
+// 	}
+// 	ETeam.Heroes[0].ClearAllStatusAndSetToFullLife()
+// 	ETeam.Heroes[0].WeaponAttack = gamedata.GetAttackSkill()
+// 	ETeam.Heroes[1].ClearAllStatusAndSetToFullLife()
+// 	ETeam.Heroes[1].WeaponAttack = gamedata.GetAttackSkill()
+// 	ETeam.Heroes[2].ClearAllStatusAndSetToFullLife()
+// 	ETeam.Heroes[2].WeaponAttack = gamedata.GetAttackSkill()
+
+// 	finfo := &data.ExpeditionStepResolveInfo{}
+// 	finfo.AddNewHappening(time.Now(), "begin", nil)
+// 	HTeam.Fight(ETeam, finfo)
+// 	logger.DumpLog.Print(finfo.String())
+// }

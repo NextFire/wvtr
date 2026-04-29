@@ -11,3 +11,11 @@ func GetSkills() []*data.Skill {
 	db.Find(&res)
 	return res
 }
+
+func GetSkillByID(id uint) *data.Skill {
+	var skill *data.Skill = &data.Skill{}
+
+	db.Find(&skill, id)
+
+	return skill
+}

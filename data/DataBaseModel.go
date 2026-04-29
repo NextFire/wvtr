@@ -13,6 +13,106 @@ type ModelBase struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
+type Damage struct {
+	ModelBase
+	SlashDmg     float64 `json:"slashDmg"`
+	BluntDmg     float64 `json:"bluntDmg"`
+	PierceDmg    float64 `json:"pierceDmg"`
+	FireDmg      float64 `json:"fireDmg"`
+	FrostDmg     float64 `json:"frostDmg"`
+	LightningDmg float64 `json:"lightningDmg"`
+
+	// polumorphism
+	OwnerID   uint   `json:"-"`
+	OwnerType string `json:"-"`
+}
+
+type StatsRange struct {
+	ModelBase
+	Min   float64 `json:"min"`
+	Max   float64 `json:"max"`
+	Value float64 `json:"value"`
+
+	// polumorphism
+	OwnerID   uint   `json:"-"`
+	OwnerType string `json:"-"`
+}
+
+type Affix struct {
+	ModelBase
+	Name   string        `json:"name"`
+	Ranges []*StatsRange `json:"ranges" gorm:"polymorphic:Owner;"`
+	Type   AffixType     `json:"type"`
+
+	// polumorphism
+	OwnerID   uint   `json:"-"`
+	OwnerType string `json:"-"`
+}
+
+type Storable struct {
+	ModelBase
+	Name string `json:"name"`
+
+	// fk
+	InventoryID uint `json:"-"`
+}
+
+type Usable struct {
+	Storable
+	StackSize   uint   `json:"stackSize"`
+	Description string `json:"description"`
+}
+
+type Equipable struct {
+	Storable
+	RealWeightScore float64  `json:"realWeightScore"`
+	Affixes         []*Affix `json:"affixes" gorm:"polymorphic:Owner;"`
+}
+
+type Weapon struct {
+	Equipable
+	BaseDamage      *Damage     `json:"baseDamage" gorm:"polymorphic:Owner;"`
+	BaseCritRate    *StatsRange `json:"baseCritRate" gorm:"polymorphic:Owner;"`
+	BaseAttackSpeed *StatsRange `json:"baseAttackSpeed" gorm:"polymorphic:Owner;"`
+
+	// Damage scaling
+	StrScaling float64 `json:"strScaling"`
+	IntScaling float64 `json:"intScaling"`
+	DexScaling float64 `json:"dexScaling"`
+	LckScaling float64 `json:"lckScaling"`
+}
+
+type Armor struct {
+	Equipable
+	BlockScore           *StatsRange `json:"blockScore" gorm:"polymorphic:Owner;"`
+	EvadeScore           *StatsRange `json:"evadeScore" gorm:"polymorphic:Owner;"`
+	BaseResistancesRange *Damage     `json:"baseResistancesRange" gorm:"polymorphic:Owner;"`
+}
+
+type Omamori struct {
+	Equipable
+}
+
+type HeroEquipment struct {
+	ModelBase
+
+	Weapon  *Weapon  `json:"weapon"`
+	Armor   *Armor   `json:"armor"`
+	Omamori *Omamori `json:"omamori"`
+
+	//fk
+	WeaponID  uint `json:"-"`
+	ArmorID   uint `json:"-"`
+	OmamoriID uint `json:"-"`
+}
+
+type Inventory struct {
+	ModelBase
+	Weapons  []*Weapon  `json:"weapons"`
+	Armors   []*Armor   `json:"armors"`
+	Omamoris []*Omamori `json:"omamoris"`
+}
+
 type HeroAttributes struct {
 	ModelBase
 
@@ -35,30 +135,57 @@ type HeroAttributes struct {
 	Dgt  float64 `json:"dgt"`
 	Lgt  float64 `json:"lgt"`
 
+	//Defense
+	BlockScore float64 `json:"blockScore"`
+	EvadeScore float64 `json:"evadeScore"`
+
 	// Resistances
-	Blunt    float64 `json:"blunt"`
-	Pierce   float64 `json:"pierce"`
-	Slash    float64 `json:"slash"`
-	Fire     float64 `json:"fire"`
-	Frost    float64 `json:"frost"`
-	Lighting float64 `json:"lighting"`
+	Blunt     float64 `json:"blunt"`
+	Pierce    float64 `json:"pierce"`
+	Slash     float64 `json:"slash"`
+	Fire      float64 `json:"fire"`
+	Frost     float64 `json:"frost"`
+	Lightning float64 `json:"lighting"`
 
 	// fk
 	HeroID uint `json:"-"`
 }
 
+type FieldActionDesc struct {
+	ModelBase
+	FromH          *Hero                `json:"fromH"`
+	UsedSkill      *Skill               `json:"usedSKill"`
+	TargetH        *Hero                `json:"targetH"`
+	TargetStatus   HeroTakeDamageStatus `json:"targetStatus"`
+	FromPVChange   float64              `json:"fromPVChange"`
+	TargetPVChange float64              `json:"targetPVChange"`
+
+	// fk
+	FromHID     uint `json:"-"`
+	UsedSkillID uint `json:"-"`
+	TargetHID   uint `json:"-"`
+}
+
 type ExpeditionStepTimestamp struct {
 	ModelBase
-	When                        time.Time `json:"when"`
-	What                        string    `json:"what"`
-	ExpeditionStepResolveInfoID uint      `json:"-"` // foreign key
+	When       time.Time        `json:"when"`
+	What       string           `json:"what"`
+	WhatAction *FieldActionDesc `json:"whatAction"`
+
+	// fk
+	ExpeditionStepResolveInfoID uint `json:"-"`
+	WhatActionID                uint `json:"-"`
 }
 
 type ExpeditionStepResolveInfo struct {
 	ModelBase
-	StepState      EncounterState             `json:"stepState"`
-	Timeline       []*ExpeditionStepTimestamp `json:"timeline"`
-	ExpeditionDBID uint                       `json:"-"` // foreign key
+	StepState EncounterState             `json:"stepState"`
+	Timeline  []*ExpeditionStepTimestamp `json:"timeline"`
+	ETeam     *Team                      `json:"eTeam"`
+
+	// fk
+	ETeamID        uint `json:"-"`
+	ExpeditionDBID uint `json:"-"`
 }
 
 type ExpeditionDB struct {
@@ -66,25 +193,24 @@ type ExpeditionDB struct {
 	Identifier   string                       `json:"identifier"`
 	StartedAt    time.Time                    `json:"startedAt"`
 	WhatHappened []*ExpeditionStepResolveInfo `json:"whatHappened"`
-	UserID       uint                         `json:"-"` // foreign key
 }
 
 type GameState struct {
 	ModelBase
-	State               EncounterState `json:"state"`
-	CurrentExpedition   *ExpeditionDB  `gorm:"foreignKey:CurrentExpeditionID" json:"currentExpedition"`
-	CurrentExpeditionID uint           `json:"-"` // foreign key
-	ETeam               *Team          `json:"eTeam"`
-	ETeamID             uint           `json:"-"` // foreign key
-	UserID              uint           `json:"-"` // foreign key
+	State             EncounterState `json:"state"`
+	CurrentExpedition *ExpeditionDB  `json:"currentExpedition"`
+
+	// fk
+	CurrentExpeditionID uint `json:"-"`
 }
 
 type HeroClass struct {
 	ModelBase
-	Name        string      `json:"name"`
-	Identifier  HeroClassID `gorm:"unique" json:"-"`
-	Descritpion string      `json:"description"`
-	Weight      float64     `json:"-"`
+	Name         string      `json:"name"`
+	Identifier   HeroClassID `gorm:"unique" json:"-"`
+	Descritpion  string      `json:"description"`
+	ClassIconURL string      `json:"class_icon_url"`
+	Weight       float64     `json:"-"`
 
 	// Base attribute
 	//Attributes
@@ -104,31 +230,43 @@ type HeroClass struct {
 
 type Skill struct {
 	ModelBase
-	Identifier  SkillID   `gorm:"unique" json:"identifier"`
-	Name        string    `json:"name"`
-	Type        SkillType `json:"skill_type"`
-	ImageURL    string    `json:"image_url"`
-	Description string    `json:"description"`
-	Weight      float64   `json:"weight"`
+	Identifier           SkillID       `gorm:"unique" json:"identifier"`
+	Name                 string        `json:"name"`
+	Type                 SkillType     `json:"skill_type"`
+	Targeting            TargetType    `json:"target_type"`
+	RecuperationDuration time.Duration `json:"recuperation_duration"`
+	ImageURL             string        `json:"image_url"`
+	Description          string        `json:"description"`
+	Weight               float64       `json:"-"`
 }
 
 type Hero struct {
 	ModelBase
-	ImageUrl      string          `json:"imageUrl"`
-	Name          string          `json:"name"`
-	Class         *HeroClass      `gorm:"foreignkey:HeroClassID" json:"heroClass"`
-	HeroClassID   uint            `json:"-"`
-	Rank          string          `json:"rank"`
-	Attributes    *HeroAttributes `json:"attributes"`
-	UniqueSkill   *Skill          `gorm:"foreignkey:UniqueSkillID" json:"uniqueSkill"`
-	UniqueSkillID uint            `json:"-"`
-	ActiveSkill   *Skill          `gorm:"foreignkey:ActiveSkillID" json:"activeSkill"`
-	ActiveSkillID uint            `gorm:"" json:"-"`
-	UserID        uint            `gorm:"" json:"-"` // foreign key
+	ImageUrl   string          `json:"imageUrl"`
+	Name       string          `json:"name"`
+	Class      *HeroClass      `gorm:"foreignkey:HeroClassID" json:"heroClass"`
+	Rank       string          `json:"rank"`
+	Attributes *HeroAttributes `json:"attributes"`
+
+	// Skills
+	WeaponAttack *Skill `gorm:"foreignkey:WeaponAttackID" json:"weaponAttack"`
+	UniqueSkill  *Skill `gorm:"foreignkey:UniqueSkillID" json:"uniqueSkill"`
+	ActiveSkill  *Skill `gorm:"foreignkey:ActiveSkillID" json:"activeSkill"`
+
+	// Items
+	Equipment *HeroEquipment `json:"equipment"`
 
 	// info that we save to request nanapi if we need to.
 	WaifuID        string `gorm:"unique" json:"id_w"` // not foreign
 	AnilistCharaID uint   `json:"id_al"`              // not foreign
+
+	// fk
+	UserID         uint `json:"-"`
+	WeaponAttackID uint `json:"-"`
+	ActiveSkillID  uint `json:"-"`
+	UniqueSkillID  uint `json:"-"`
+	HeroClassID    uint `json:"-"`
+	EquipmentID    uint `json:"-"`
 }
 
 type Team struct {
@@ -139,22 +277,38 @@ type Team struct {
 type User struct {
 	ModelBase
 	Name           string     `json:"name"`
+	Inventory      *Inventory `json:"inventory"`
 	State          *GameState `json:"state"`
 	CurrentTeam    *Team      `json:"currentTeam"`
-	CurrentTeamID  uint       `json:"-"` // foreign key
 	LastActionTime time.Time  `json:"lastActionTime"`
 	OwnedHeroes    []*Hero    `json:"ownedHeroes"`
 	DiscordID      string     `gorm:"unique" json:"discord_id"`
+
+	// fk
+	InventoryID   uint `json:"-"`
+	StateID       uint `json:"-"`
+	CurrentTeamID uint `json:"-"`
 }
 
 var DBSchema []any = []any{
+	&Damage{},
+	&StatsRange{},
+	&Affix{},
+	&Storable{},
+	&Usable{},
+	&Weapon{},
+	&Armor{},
+	&Omamori{},
+	&Skill{},
+	&HeroEquipment{},
+	&Inventory{},
 	&HeroAttributes{},
+	&FieldActionDesc{},
 	&ExpeditionStepTimestamp{},
 	&ExpeditionStepResolveInfo{},
 	&ExpeditionDB{},
 	&GameState{},
 	&HeroClass{},
-	&Skill{},
 	&Hero{},
 	&Team{},
 	&User{},

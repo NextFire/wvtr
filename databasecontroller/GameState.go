@@ -3,9 +3,29 @@ package databasecontroller
 import (
 	"time"
 	"wvtrserv/data"
-	"wvtrserv/gamedata"
 	"wvtrserv/logger"
 )
+
+func GetGameState(gameState *data.GameState) *data.GameState {
+	db.Preload("CurrentExpedition").
+		Find(&gameState)
+
+	gameState.CurrentExpedition = GetCurrentExpedition(gameState.CurrentExpedition)
+
+	return gameState
+}
+
+func GetGameStateByID(id uint) *data.GameState {
+	var gs *data.GameState = &data.GameState{}
+	// We can request equipment id later
+	db.Preload("CurrentExpedition").
+		Find(&gs, id)
+
+	if gs.CurrentExpedition != nil {
+		gs.CurrentExpedition = GetExpeditionDBByID(gs.CurrentExpedition.ID)
+	}
+	return gs
+}
 
 func UpdateGameState(state *data.GameState) {
 	db.Save(state)
@@ -29,16 +49,15 @@ func UpdateGameStateWithIndex(g *data.GameState, idx int) *data.ExpeditionStepRe
 	if idx < 0 || idx >= len(g.CurrentExpedition.WhatHappened) {
 		g.State = data.Home
 		g.CurrentExpedition = nil
-		g.ETeam = nil
 		return nil
 	}
 
 	currentExpStep = g.CurrentExpedition.WhatHappened[idx]
 
 	g.State = currentExpStep.StepState
-	if g.State == data.Fight {
-		glTeam := gamedata.GetEnemyTeamForEvent(g.CurrentExpedition.Identifier, idx)
-		g.ETeam = (*data.Team)(glTeam)
-	}
+	// if g.State == data.Fight {
+	// 	glTeam := gamedata.GetEnemyTeamForEvent(g.CurrentExpedition.Identifier, idx)
+	// 	g.ETeam = (*data.Team)(glTeam)
+	// }
 	return currentExpStep
 }

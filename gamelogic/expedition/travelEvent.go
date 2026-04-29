@@ -25,8 +25,18 @@ func (e TravelEvent) GetEventType() data.EncounterState {
 func (e TravelEvent) Solve(startAt time.Time, t *data.Team) *data.ExpeditionStepResolveInfo {
 	resExp := data.NewExpeditionResolveInfo(e.GetEventType())
 
-	resExp.AddNewHappening(startAt, "Traveling Start")
-	resExp.AddNewHappening(startAt.Add(e.duration), "Traveling End")
+	resExp.AddNewHappening(startAt, "Traveling Start", nil)
+	resExp.AddNewHappening(startAt.Add(e.duration), "Traveling End", nil)
 
 	return resExp
+}
+
+func (e TravelEvent) CopyEvent() ExpeditionEvent {
+	return &TravelEvent{
+		EEvent: EEvent{
+			duration:         e.duration,
+			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
+			name:             e.name,
+		},
+	}
 }
