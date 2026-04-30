@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import { inject } from "vue";
-import type { Hero } from "../model/types.ts"
-    import { global, NavigationHandler } from "../model/utils.ts"
+import type { Hero } from "../tools/types.ts"
+    import { global } from "../tools/utils.ts"
+import type { NavigationHandler } from "@/tools/navigationHandler.ts";
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     const hero = navigationHandler.getHeroToInspect()

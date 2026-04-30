@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, watch } from 'vue'
-    import type { Hero, Waifu } from "../model/types.ts"
-    import { global } from "../model/utils.ts"
+    import type { Hero, Waifu } from "../tools/types.ts"
+    import { global } from "../tools/utils.ts"
 
     const props = defineProps<{
         waifu: Waifu;

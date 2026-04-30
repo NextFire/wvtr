@@ -1,8 +1,8 @@
 <script setup lang="ts">
     import { ref, watch } from 'vue'
-    import type { Team } from "../model/types.ts"
+    import type { Team } from "../tools/types.ts"
     import Hero from './Hero.vue'
-    import { global } from "../model/utils.ts"
+    import { global } from "../tools/utils.ts"
 
     const {team} = defineProps<{
         team: Team;

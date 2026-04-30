@@ -1,8 +1,8 @@
 <script setup lang="ts">
     import { ref, watch } from "vue"
-    import type { Team, User } from "../model/types.ts"
-    import type { Hero } from "../model/types.ts"
-    import { global, postRequest, RequestType } from "../model/utils.ts"
+    import type { Team, User } from "../tools/types.ts"
+    import type { Hero } from "../tools/types.ts"
+    import { global, postRequest, RequestType } from "../tools/utils.ts"
 import InspectButton from "./InspectButton.vue";
 
     // const currentHomeStatus = ref(HomeStatus.Noting);

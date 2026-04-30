@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import { inject } from "vue";
-import type { Hero } from "../model/types.ts"
-    import { global, HomeStatus, NavigationHandler } from "../model/utils.ts"
+    import type { Hero } from "../tools/types.ts"
+    import { global } from "../tools/utils.ts"
+    import { HomeStatus, NavigationHandler } from "../tools/navigationHandler.ts";
 
     const props = defineProps<{
         hero: Hero;

@@ -1,12 +1,10 @@
 <script setup lang="ts">
     import { inject, onMounted, ref, watch } from "vue"
-    import type { ExpeditionStepResolveInfo, User, Waifu } from "../model/types.ts"
-    import type { Hero } from "../model/types.ts"
-    import Team from "./Team.vue"
-    import { global, fetchData, RequestType, postRequest, launchExpedition, formatTextTimeFromTimeMS, createAHeroFromAWaifu, NavigationHandler, HomeStatus } from "../model/utils.ts"
+    import type { User, Waifu } from "../tools/types.ts"
+    import type { Hero } from "../tools/types.ts"
+    import { global, fetchData, RequestType, createAHeroFromAWaifu } from "../tools/utils.ts"
     import WaifuComp from "./WaifuComp.vue"
-
-    // const currentHomeStatus = ref(HomeStatus.Noting);
+    import { HomeStatus, NavigationHandler } from "../tools/navigationHandler.ts"
 
     const props = defineProps<{
         user: User

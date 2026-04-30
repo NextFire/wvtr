@@ -1,10 +1,10 @@
 <script setup lang="ts">
-    import type { User } from "../model/types.ts"
-    import { global } from "../model/utils.ts"
+    import { inject } from "vue";
+import type { NavigationHandler } from "@/tools/navigationHandler.ts";
 
-    const props = defineProps<{
-        user: User | undefined;
-    }>();
+    const navigationHandler = inject<NavigationHandler>('navigationHandler')!
+    const user = navigationHandler.getUser() 
+
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-    import type { User } from "../model/types.ts"
-    import { global } from "../model/utils.ts"
+    import type { User } from "../tools/types.ts"
+    import { global } from "../tools/utils.ts"
 
 </script>
 

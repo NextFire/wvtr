@@ -1,12 +1,12 @@
 <script setup lang="ts">
     import { inject, onMounted, ref, watch } from "vue"
-    import type { Hero, User } from "../model/types.ts"
+    import type { Hero, User } from "../tools/types.ts"
     import Team from "./Team.vue"
     import TeamManagement from "./TeamManagement.vue"
     import ExpeditionsList from "./ExpeditionsList.vue"
-import Waifus from "./Waifus.vue"
-import InspectHero from "./InspectHero.vue"
-import { HomeStatus, NavigationHandler } from "@/model/utils.ts"
+    import Waifus from "./Waifus.vue"
+    import InspectHero from "./InspectHero.vue"
+    import { HomeStatus, NavigationHandler } from "@/tools/navigationHandler.ts"
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
 
@@ -30,7 +30,7 @@ import { HomeStatus, NavigationHandler } from "@/model/utils.ts"
             <button v-on:click="setHomeStatus(HomeStatus.ExpeditionManagement)">
             launch expedition
             </button>
-            <button v-on:click="setHomeStatus(HomeStatus.HeroGetter)">
+            <button v-on:click="setHomeStatus(HomeStatus.HeroMaker)">
             Check available waifus
             </button>
         </div>
@@ -39,7 +39,7 @@ import { HomeStatus, NavigationHandler } from "@/model/utils.ts"
                 :ownedHeroes="user.ownedHeroes"/>
         
         <ExpeditionsList v-else-if="navigationHandler.getHomeStatus().value == HomeStatus.ExpeditionManagement" :user="user"/>
-        <Waifus v-else-if="navigationHandler.getHomeStatus().value == HomeStatus.HeroGetter" :user="user"/>
+        <Waifus v-else-if="navigationHandler.getHomeStatus().value == HomeStatus.HeroMaker" :user="user"/>
         <InspectHero v-else-if="navigationHandler.getHomeStatus().value == HomeStatus.InspectHero"/>
     <!-- </div> -->
 </template>

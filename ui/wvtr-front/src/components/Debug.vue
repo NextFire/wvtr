@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, watch, reactive } from 'vue'
-    import type { Hero } from "../model/types.ts"
-    import { global } from "../model/utils.ts"
+    import type { Hero } from "../tools/types.ts"
+    import { global } from "../tools/utils.ts"
     
     const heroId = ref(1)
     //const jsonres = ref<Hero>({})

@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp, ref } from 'vue'
 import App from './App.vue'
 import VueCookies from 'vue-cookies';
-import { NavigationHandler } from './model/utils';
+import { NavigationHandler } from './tools/navigationHandler';
 
 
 

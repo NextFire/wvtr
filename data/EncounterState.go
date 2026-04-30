@@ -7,6 +7,7 @@ const (
 	Travel
 	Fight
 	Neutral
+	Report
 	Error
 )
 

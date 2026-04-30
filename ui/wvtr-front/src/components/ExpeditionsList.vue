@@ -1,9 +1,9 @@
 <script setup lang="ts">
     import { onMounted, ref, watch } from "vue"
-    import type { ExpeditionStepResolveInfo, User } from "../model/types.ts"
-    import type { Hero } from "../model/types.ts"
+    import type { ExpeditionStepResolveInfo, User } from "../tools/types.ts"
+    import type { Hero } from "../tools/types.ts"
     import Team from "./Team.vue"
-    import { global, fetchData, RequestType, postRequest, launchExpedition, formatTextTimeFromTimeMS } from "../model/utils.ts"
+    import { global, fetchData, RequestType, postRequest, launchExpedition, formatTextTimeFromTimeMS } from "../tools/utils.ts"
 
     // const currentHomeStatus = ref(HomeStatus.Noting);
 
