@@ -2,7 +2,7 @@
     import { ref, onMounted, inject } from 'vue'
     import Header from "./components/Header.vue"
     import Body from "./components/Body.vue"
-    import { NavigationHandler } from './tools/navigationHandler.ts'
+    import { NavigationHandler, NavigationStatus } from './tools/navigationHandler.ts'
     import type { User } from "./tools/types.ts"
     import type { VueCookies } from 'vue-cookies'
 
@@ -21,12 +21,12 @@
 </script>
 
 <template>
-<div v-if="!user" class="page">
+<div v-if="navigationHandler.getNavigationStatus().value == NavigationStatus.Connexion" class="page">
     <!-- <a v-if="authUrl" :href="authUrl">Login with OIDC</a> -->
     <p>loading auth...</p>
     <!-- <p v-else>loading auth...</p> -->
 </div>
-<div v-if="user" class="page">
+<div v-else class="page">
     <Header/>
     <Body/>
 </div>

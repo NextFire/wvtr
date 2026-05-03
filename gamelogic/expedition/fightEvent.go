@@ -45,10 +45,11 @@ func (e *FightEvent) Solve(startAt time.Time, heroTeam *data.Team) *data.Expedit
 	resExp := data.NewExpeditionResolveInfo(e.GetEventType())
 
 	resExp.AddNewHappening(startAt, "Fight start", nil)
-	heroTeam.Fight(e.GenerateTeamToFightFromAreaPool(), resExp)
-	//Fight(heroTeam, e.GenerateTeamToFightFromAreaPool(), resExp)
-	resExp.AddNewHappening(startAt.Add(e.duration), "Fight End", nil)
+	resExp.ETeam = e.GenerateTeamToFightFromAreaPool()
+
+	heroTeam.Fight(resExp.ETeam, resExp)
 	e.duration = resExp.GetDuration()
+	resExp.AddNewHappening(startAt.Add(e.GetDuration()), "Fight End", nil)
 	return resExp
 }
 

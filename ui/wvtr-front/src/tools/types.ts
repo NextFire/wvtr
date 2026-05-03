@@ -140,8 +140,6 @@ type HeroAttributes = {
     lighting: number
 }
 
-
-
 type HeroClass = {
     name: string
     descritpion: string
@@ -169,15 +167,29 @@ type ExpeditionStepResolveInfo = {
     eTeam: Team | null
 }
 
+type ExpToGetFromBack = {
+    key: string,
+    imgURL: string,
+    duration: number,
+}
+
+type ExpeditionDB = {
+    identifier: string,
+    startedAt: string,
+    whatHappened: ExpeditionStepResolveInfo[],
+}
+
 type GameState = {
+    id: number
     state: EncounterState,
+    currentExpedition: ExpeditionDB,
 }
 
 type User = {
     id: number
     name: string
-    inventory: Inventory
     state: GameState
+    inventory: Inventory
     currentTeam: Team
     lastActionTime: string // time
     ownedHeroes: Hero[]
@@ -239,11 +251,16 @@ export type {
     GameState,
     User,
     ExpeditionStepResolveInfo,
+    ExpeditionStepTimestamp,
     CurrentStepRequestMessage,
+    ExpeditionDB,
     Waifu,
+    FieldActionDesc,
+    ExpToGetFromBack,
 };
 
 export {
     EncounterState,
+    HeroTakeDamageStatus,
 }
 

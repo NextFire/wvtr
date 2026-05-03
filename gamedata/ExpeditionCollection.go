@@ -9,39 +9,64 @@ import (
 var traval30s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*30, "Travel")
 var traval40s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*40, "Travel")
 var traval10s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*10, "Travel")
-var nothing10s expedition.ExpeditionEvent = expedition.NewNeutralEvent(time.Second*10, "Neutral", expedition.HappeningType(func(t *data.Team, e *data.ExpeditionStepResolveInfo) {}))
+var goingToPlains expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*30, "Going to the plains")
 var plainFight expedition.ExpeditionEvent = expedition.NewFightEvent(PlainPool, "Plain fight")
 
+var nothing10s expedition.ExpeditionEvent = expedition.NewNeutralEvent(time.Second*10, "Neutral",
+	expedition.HappeningType(func(t *data.Team, e *data.ExpeditionStepResolveInfo) {}))
+
+var selfTraining expedition.ExpeditionEvent = expedition.NewNeutralEvent(time.Second*30, "Self training (30 minutes)",
+	expedition.HappeningType(func(t *data.Team, e *data.ExpeditionStepResolveInfo) {
+		for _, h := range t.Heroes {
+			h.GainXP(5)
+			e.AddNewHappening(time.Now(), h.Name+" Gained 5 xp points.", nil)
+		}
+	}))
+
 var Expeditions = map[string]expedition.Expedition{
-	"travel30s": {
+	"Travel 30 sec": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
 			traval30s,
 		},
 	},
-	"travel40s": {
+	"Travel 40 sec": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
 			traval40s,
 		},
 	},
-	"travelAndDoNothing": {
+	"Travel and do nothing": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
 			traval10s,
 			nothing10s,
 		},
 	},
-	"plainQuest": {
+	"Plain quest": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
-			traval10s,
+			goingToPlains,
 			plainFight,
-			nothing10s,
+			goingToPlains,
+		},
+	},
+	"Training": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/self_training.png",
+		Events: []expedition.ExpeditionEvent{
+			selfTraining,
 		},
 	},
 }
 
-func GetAvailableExpeditions() map[string]time.Duration {
-	res := make(map[string]time.Duration)
+func GetAvailableExpeditions() []*expedition.ExpToSendToFront {
+	res := make([]*expedition.ExpToSendToFront, 0)
 	for k, v := range Expeditions {
-		res[k] = v.GetMinimumTotalTime()
+		res = append(res, &expedition.ExpToSendToFront{
+			Key:      k,
+			ImgURL:   v.ImgURL,
+			Duration: v.GetMinimumTotalTime(),
+		})
 	}
 	return res
 }

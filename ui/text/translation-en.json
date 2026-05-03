@@ -1,0 +1,12 @@
+{
+    "loading": "Loading...",
+    "button.manage.team": "Manage team",
+    "title.manage.team": "Select Your team (3 heroes maximum)",
+    "button.launch.expedition": "Launch expedition",
+    "title.launch.expedition": "Select an expedition",
+    "button.waifus": "Check available waifus",
+    "title.waifus": "Select a waifu to make a new hero",
+    "combat.tookdamage": "{from_name} inflicted {dmg} damage {is_crit} to {target_name}.",
+    "combat.died": "{target_name} died.",
+    "combat.notdamaged": "{target_name} {avoid_reason}."
+}

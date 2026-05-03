@@ -5,20 +5,19 @@
     import Expedition from "./Expedition.vue"
 import { NavigationHandler } from "@/tools/navigationHandler.ts"
 import { inject } from "vue"
+import Report from "./Report.vue"
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
-    const user = navigationHandler.getUser() 
+    console.log(navigationHandler.getUserState())
 </script>
 
 <template>
-    <div v-if="user" class="body">
-        <Home v-if="user.state.state == EncounterState.Home" :user="user" />
-        <div v-else-if="user.state.state == EncounterState.Error">
-            <h1> There is a problem </h1>
-        </div>
-        <Expedition v-else :user="user"/>
+    <div v-if="navigationHandler.getUserState() != EncounterState.Error" class="body">
+        <Home v-if="navigationHandler.getUserState() == EncounterState.Home"/>
+        <Report v-else-if="navigationHandler.getUserState() == EncounterState.Report"/>
+        <Expedition v-else/>
     </div>
     <div v-else class="body">
-        <h1>Chargement ...</h1>
+        there is a problem with user...
     </div>
 </template>

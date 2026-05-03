@@ -47,13 +47,13 @@ func UpdateGameStateWithIndex(g *data.GameState, idx int) *data.ExpeditionStepRe
 	var currentExpStep *data.ExpeditionStepResolveInfo = nil
 
 	if idx >= len(g.CurrentExpedition.WhatHappened) {
-		g.State = data.Home
-		g.CurrentExpedition = nil
+		g.State = data.Report
+		//g.CurrentExpedition = nil
 		return nil
 	}
 
 	if idx < 0 {
-		g.State = data.Report
+		g.State = data.Error
 		return nil
 	}
 

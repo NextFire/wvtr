@@ -1,40 +1,30 @@
 <script setup lang="ts">
-    import { onMounted, ref, watch } from "vue"
-    import type { ExpeditionStepResolveInfo, User } from "../tools/types.ts"
-    import type { Hero } from "../tools/types.ts"
-    import Team from "./Team.vue"
-    import { global, fetchData, RequestType, postRequest, launchExpedition, formatTextTimeFromTimeMS } from "../tools/utils.ts"
+    import { inject, onMounted, ref, watch } from "vue"
+    import type { ExpeditionStepResolveInfo, ExpToGetFromBack } from "../tools/types.ts"
+    import { global, formatTextTimeFromTimeMS } from "../tools/utils.ts"
+import type { NavigationHandler } from "@/tools/navigationHandler.ts"
 
-    // const currentHomeStatus = ref(HomeStatus.Noting);
+    const navigationHandler = inject<NavigationHandler>('navigationHandler')!
+        
+    const expeditions = navigationHandler.getAvailableExpedition()
+    const user = navigationHandler.getUser()
 
-    const props = defineProps<{
-        user: User
-    }>();
-
-    let expeditions = ref<Record<string,number>|undefined>(undefined)
-
-    onMounted(async () => {
-        await fetchData<Record<string,number>>(expeditions, RequestType.AvailableExpeditions) 
-        console.log(expeditions)
+    let selectedExp = ref("")
+    const errorMsg = ref("") 
+    let selectionB = ref<Record<string,string>>({})
+    onMounted(()=>{
+        fillSelectionB(expeditions.value!)
     })
 
-    let selectedExp = ref("") 
-    let selectionB = ref<Record<string,string>>({})
-    function fillSelectionB(e: Record<string,number>) {
-        for (const k in e) {
-            if (k === selectedExp.value) {
-                selectionB.value[k] = "eselected"
+    function fillSelectionB(e: ExpToGetFromBack[]) {
+        for (let i = 0; i < e.length; i++) {
+            if (e[i]!.key === selectedExp.value) {
+                selectionB.value[e[i]!.key] = "eselected"
             } else {
-                selectionB.value[k] = "enotselected"
+                selectionB.value[e[i]!.key] = "enotselected"
             }
         }
     }
-
-    watch(expeditions, (newExp) => {
-        if (newExp) {
-            fillSelectionB(newExp)
-        }
-    })
 
     function clickOnExpedition(e: string) {
         if (expeditions.value) {
@@ -50,15 +40,15 @@
 
     let expStepInfo = ref<ExpeditionStepResolveInfo|undefined>(undefined)
     async function onclick() {
-        let pathparms = [
-            {id:"usr", value: ""+props.user.id},
-            {id:"expId", value:selectedExp.value},
-        ]
-        launchExpedition(expStepInfo, props.user, selectedExp.value)
+        if (user.value!.currentTeam.heroes.length > 0) {
+            await navigationHandler.launchExpedition(expStepInfo, selectedExp.value)
+        } else {
+            errorMsg.value = "You should have at least one hero in your team before starting an expedition."
+        }
     }
     watch(expStepInfo, (newExpInfo) => {
         if (newExpInfo) {
-            props.user.state.state = newExpInfo.stepState
+            user.value!.state.state = newExpInfo.stepState
         }
     })
 
@@ -67,17 +57,18 @@
 <template>
     <div v-if="expeditions">
         <h1>Select an Expedition</h1>
+        <div style="display: flex; align-items: center; justify-content: center;">
+            <div>
+                <button v-on:click="onclick()">launch expedition</button>
+                <p>{{ errorMsg }}</p>
+            </div>
+        </div>
         <div class="column">
             <div class="row"> 
-                <div v-for="(value, key) in expeditions" v-on:click="clickOnExpedition(key)" :class="selectionB[key]">
-                    <p style="text-align: center;">{{ key }}</p>
-                    <p style="text-align: center;">time : {{ formatTextTimeFromTimeMS(value/1000000) }}</p>
-                    <img :src="global.DOMAIN_NAME + global.EXPEDITION" width="150px">
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <div>
-                    <button v-on:click="onclick()">launch expedition</button>
+                <div v-for="e in expeditions" v-on:click="clickOnExpedition(e.key)" :class="selectionB[e.key]">
+                    <p style="text-align: center;">{{ e.key }}</p>
+                    <p style="text-align: center;">time : {{ formatTextTimeFromTimeMS(e.duration/1000000) }}</p>
+                    <img :src="e.imgURL" width="150px">
                 </div>
             </div>
         </div>

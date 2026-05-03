@@ -7,7 +7,7 @@ var SwordBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Slash: {Min: 2, Max: 5},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1.7, Max: 2},
+	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 7},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -28,7 +28,7 @@ var HammerBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Blunt: {Min: 5, Max: 10},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 2.5, Max: 4},
+	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 10},
 	BaseCritRate:    &data.StatsRange{Min: 0, Max: 1},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -49,7 +49,7 @@ var SpearBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Pierce: {Min: 2, Max: 4},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1.2, Max: 1.9},
+	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 6},
 	BaseCritRate:    &data.StatsRange{Min: 6, Max: 12},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -71,7 +71,7 @@ var DaggerBase *data.WeaponBase = &data.WeaponBase{
 		data.Pierce: {Min: 1, Max: 3},
 		data.Slash:  {Min: 1, Max: 3},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1, Max: 1.6},
+	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 5},
 	BaseCritRate:    &data.StatsRange{Min: 15, Max: 25},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -92,7 +92,7 @@ var BowBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Pierce: {Min: 2, Max: 6},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1.2, Max: 1.9},
+	BaseAttackSpeed: &data.StatsRange{Min: 4, Max: 8},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -113,7 +113,7 @@ var FistBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Blunt: {Min: 1, Max: 2},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1.8, Max: 3},
+	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 10},
 	BaseCritRate:    &data.StatsRange{Min: 0, Max: 0.5},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -134,7 +134,7 @@ var TuskBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Pierce: {Min: 2, Max: 4},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 2.4, Max: 4},
+	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 15},
 	BaseCritRate:    &data.StatsRange{Min: 7, Max: 10},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{
@@ -155,7 +155,7 @@ var ClawBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
 		data.Slash: {Min: 3, Max: 6},
 	},
-	BaseAttackSpeed: &data.StatsRange{Min: 1.5, Max: 3},
+	BaseAttackSpeed: &data.StatsRange{Min: 4, Max: 8},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
 		AffixesPool: []*data.Affix{

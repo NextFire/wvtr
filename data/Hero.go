@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"wvtrserv/logger"
 )
 
 type HeroTakeDamageStatus byte
@@ -52,7 +53,7 @@ func (h *Hero) GainXP(amount float64) {
 		thresholdForCurrentLevel := h.Attributes.LevelThreshold()
 		xpToGainForLevel := amount
 
-		if amount >= thresholdForCurrentLevel {
+		if amount+h.Attributes.CurrentXP >= thresholdForCurrentLevel {
 			xpToGainForLevel = thresholdForCurrentLevel
 			h.LevelUp()
 		}
@@ -66,10 +67,12 @@ func (h *Hero) IncreaseAttributeWithRate() {
 	attrs := h.Attributes.GetAttributesArray()
 	grs := h.Attributes.GetGRArray()
 	for i := range len(grs) {
+		// this is in case the proba is above 100%
 		toadd := float64(int(grs[i]))
-		proba := attrs[i] - toadd
-		if RollCheck(NaturalRoll(0, 1), proba) {
+		proba := grs[i] - toadd
+		if RollCheck(NaturalRoll(0, 1), 1-proba) {
 			toadd++
+
 		}
 		attrs[i] += toadd
 	}
@@ -78,7 +81,8 @@ func (h *Hero) IncreaseAttributeWithRate() {
 
 func (h *Hero) LevelUp() {
 	h.Attributes.Level += 1
-
+	h.Attributes.CurrentXP = 0
+	h.Attributes.XPToLvlUp = h.Attributes.LevelThreshold()
 	h.IncreaseAttributeWithRate()
 }
 
@@ -142,8 +146,12 @@ func (h *Hero) ChooseTarget(t *Team) *Hero {
 
 func (h *Hero) ChooseAction(friends *Team, enemies *Team) (*Skill, *Hero) {
 	action := h.WeaponAttack
+
 	if h.ActiveSkill != nil && RollCheck(NaturalRoll(0, 1), 0.5) {
 		action = h.ActiveSkill
+	}
+	if action == nil {
+		return nil, nil
 	}
 	var target *Hero = nil
 	switch action.Targeting {
@@ -159,9 +167,13 @@ func (h *Hero) ChooseAction(friends *Team, enemies *Team) (*Skill, *Hero) {
 
 func (h *Hero) Play(when time.Time, friends *Team, enemies *Team, fightReport *ExpeditionStepResolveInfo) time.Duration {
 	what, target := h.ChooseAction(friends, enemies)
+	if what == nil || target == nil {
+		return 30 * time.Second
+	}
 	report := fmt.Sprintf("%s use %s on %s.", h.Name, what.Name, target.Name)
 
 	fad := what.UseActive(h, target)
+	logger.DumpLog.Println(fad.String())
 	fightReport.AddNewHappening(when, report, fad)
 	return what.RecuperationDuration
 }
@@ -225,7 +237,7 @@ func (h *Hero) InitiativeRoll() time.Duration {
 	dex := h.Attributes.Dexterity
 
 	initiativeRoll := h.RollNumber(0.5, dex)
-	secInitiative := time.Duration(5.0/initiativeRoll) * time.Second
+	secInitiative := time.Duration((5.0/initiativeRoll)+5.0) * time.Second
 	resInit := secInitiative + time.Duration(NaturalRoll(-100000, 100000))*time.Nanosecond
 	return resInit
 }

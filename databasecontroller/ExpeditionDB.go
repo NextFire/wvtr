@@ -33,5 +33,5 @@ func GetCurrentExpeditionStepIdx(e data.ExpeditionDB, t *time.Time) int {
 			return i
 		}
 	}
-	return -1
+	return len(e.WhatHappened)
 }

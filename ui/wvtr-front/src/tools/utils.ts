@@ -1,6 +1,5 @@
-import { ref, type Ref } from 'vue'
-import type { CurrentStepRequestMessage, ExpeditionStepResolveInfo, Hero, User, Waifu } from './types';
-import type { VueCookies } from 'vue-cookies';
+import type { Ref } from 'vue'
+import { EncounterState, HeroTakeDamageStatus, type CurrentStepRequestMessage, type ExpeditionStepResolveInfo, type FieldActionDesc, type Hero, type User, type Waifu } from './types';
 
 class global {
     public static readonly DOMAIN_NAME = "https://tama.rhiobet.sh";
@@ -11,14 +10,17 @@ class global {
     //Request object by id
     public static readonly REQ_HERO = "/hero/{id}";
     public static readonly REQ_TEAM = "/teams/{id}";
-    public static readonly REQ_GAMESTATE = "/gamestate/{id}";
+    public static readonly REQ_EXPEDITIONREPORT = "/expeditionReport/{uid}";
     public static readonly REQ_USR = "/user/{id}";
     public static readonly REQ_AVAILABLEEXPEDITIONS = "/availableexpeditions/"
     public static readonly REQ_CURRENTEXPEDITIONSTEP = "/currentexpeditionstep/";
 
+
     //request update objects
     public static readonly REQ_LAUNCHEXPEDITION = "/launchExpedition/{usr}/{expId}";
     public static readonly REQ_UPDATETEAM = "/updateTeam/";
+    public static readonly REQ_SAVEUSER = "/saveUser/";
+    public static readonly REQ_SAVEGAMESTATE = "/saveGameState/";
 
     //Create objects
     public static readonly REQ_CREATEHEROFROMWAIFU = "/createherofromwaifu/{id}"
@@ -34,21 +36,18 @@ class global {
 enum RequestType {
     Hero = 1,
     Team,
-    GameState,
+    ExpeditionReport,
     User,
     AvailableExpeditions,
     CurrentExpeditionStep,
     UserWaifus,
     CreateHeroFromWaifu,
+    SaveUser,
+    SaveGameState,
 
     LaunchExpedition,
     UpdateTeam,
 }
-
-
-
-
-
 
 
 function buildRequestPath(reqType: RequestType, pathParams: { id: string; value: string }[] | undefined = undefined): string {
@@ -60,8 +59,8 @@ function buildRequestPath(reqType: RequestType, pathParams: { id: string; value:
         case RequestType.Team:
             request += global.REQ_TEAM
             break
-        case RequestType.GameState:
-            request += global.REQ_GAMESTATE
+        case RequestType.ExpeditionReport:
+            request += global.REQ_EXPEDITIONREPORT
             break
         case RequestType.User:
             request += global.REQ_USR
@@ -83,6 +82,12 @@ function buildRequestPath(reqType: RequestType, pathParams: { id: string; value:
             break
         case RequestType.UpdateTeam:
             request += global.REQ_UPDATETEAM
+            break
+        case RequestType.SaveUser:
+            request += global.REQ_SAVEUSER
+            break
+        case RequestType.SaveGameState:
+            request += global.REQ_SAVEGAMESTATE
             break
         default:
             request = ""
@@ -147,6 +152,7 @@ async function launchExpedition(target: Ref<ExpeditionStepResolveInfo | undefine
     request = request.replace(`{expId}`, expIdentifier)
     const response = await fetch(request);
     target.value = await response.json() as ExpeditionStepResolveInfo
+    console.log(target.value)
     if (target.value) {
         user.state.state = target.value.stepState
     }
@@ -181,13 +187,69 @@ function formatTextTimeFromTimeMS(timeMS: number) {
     return res
 }
 
+function getStringFromFAD(fad: FieldActionDesc): string[] {
+    let res = new Array<string>();
+    let from = fad.fromH
+    let fromname = (from && from.name ? from.name : "uknown")
+    let target = fad.targetH
+    let targetname = (target && target.name ? target.name : "uknown")
+    let status = fad.targetStatus
+
+    let critTxt = ""
+    if (!!(status & HeroTakeDamageStatus.Crit)) {
+        critTxt = "(crit)"
+    }
+
+    let targetPVChange = fad.targetPVChange
+    if (!!(status & HeroTakeDamageStatus.TookDamage)) {
+        res.push(fromname + " has inflicted " + targetPVChange.toFixed(2) + " dmg" + critTxt + " to " + targetname)
+    }
+    if (!!(status & HeroTakeDamageStatus.Died)) {
+        res.push(targetname + " died.")
+    }
+    if (!!(status & HeroTakeDamageStatus.Dodged)) {
+        res.push(targetname + " dodged.")
+    }
+    if (!!(status & HeroTakeDamageStatus.Blocked)) {
+        res.push(targetname + " blocked.")
+    }
+    return res
+}
+
+function getEncounterStateString(state: EncounterState): string {
+    switch (state) {
+        case EncounterState.Home:
+            return "Home"
+            break
+        case EncounterState.Travel:
+            return "Travel"
+            break
+        case EncounterState.Fight:
+            return "Fight"
+            break
+        case EncounterState.Neutral:
+            return "Neutral"
+            break
+        case EncounterState.Report:
+            return "Report"
+            break
+        case EncounterState.Error:
+            return "Error"
+            break
+    }
+    return ""
+}
+
 export {
     global,
     fetchData,
     postRequest,
     launchExpedition,
     getCurrentExpeditionStepResolveInfo,
+    getEncounterStateString,
     formatTextTimeFromTimeMS,
     createAHeroFromAWaifu,
+    getStringFromFAD,
+    buildRequestPath,
     RequestType,
 }

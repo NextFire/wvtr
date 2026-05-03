@@ -1,0 +1,422 @@
+{
+    "id": 1,
+    "name": "Tama",
+    "inventory": null,
+    "state": {
+        "id": 1,
+        "state": 1,
+        "currentExpedition": {
+            "id": 2,
+            "identifier": "Training",
+            "startedAt": "2026-05-03T12:22:11.705190615Z",
+            "whatHappened": [
+                {
+                    "id": 2,
+                    "stepState": 4,
+                    "timeline": [
+                        {
+                            "id": 4,
+                            "when": "2026-05-03T14:21:41.705190615+02:00",
+                            "what": "Traveling Start",
+                            "whatAction": null
+                        },
+                        {
+                            "id": 5,
+                            "when": "2026-05-03T14:21:41.705193256+02:00",
+                            "what": "Anna Yamada Gained 5 xp points.",
+                            "whatAction": null
+                        },
+                        {
+                            "id": 6,
+                            "when": "2026-05-03T14:21:41.705194216+02:00",
+                            "what": "Eru Chitanda Gained 5 xp points.",
+                            "whatAction": null
+                        },
+                        {
+                            "id": 7,
+                            "when": "2026-05-03T14:22:11.705190615+02:00",
+                            "what": "Traveling End",
+                            "whatAction": null
+                        }
+                    ],
+                    "eTeam": null
+                }
+            ]
+        }
+    },
+    "currentTeam": {
+        "id": 1,
+        "heroes": [
+            {
+                "id": 8,
+                "imageUrl": "https://s4.anilist.co/file/anilistcdn/character/large/b174190-Yl9xcIc5VTtI.jpg",
+                "name": "Anna Yamada",
+                "heroClass": {
+                    "id": 2,
+                    "name": "Mage",
+                    "description": "Relying mostly on intelligence",
+                    "class_icon_url": ""
+                },
+                "rank": "S",
+                "attributes": {
+                    "id": 8,
+                    "level": 1,
+                    "currentXP": 0,
+                    "xpBeforLvlUp": 6.25,
+                    "currentHP": 10,
+                    "maxHP": 10,
+                    "strength": 1,
+                    "intelligence": 6,
+                    "dexterity": 2,
+                    "luck": 3,
+                    "hpgt": 0.3044362391659607,
+                    "sgt": 0.2199252424719642,
+                    "igt": 0.8329480654669904,
+                    "dgt": 0.22468717214809164,
+                    "lgt": 0.3082477303858665,
+                    "blockScore": 0,
+                    "evadeScore": 0,
+                    "blunt": 0,
+                    "pierce": 0,
+                    "slash": 0,
+                    "fire": 0,
+                    "frost": 0,
+                    "lighting": 0
+                },
+                "weaponAttack": {
+                    "id": 15,
+                    "identifier": 16,
+                    "name": "Attack",
+                    "skill_type": 1,
+                    "target_type": 1,
+                    "recuperation_duration": 1000000000,
+                    "image_url": "",
+                    "description": "Attack with whatever they have in hand."
+                },
+                "uniqueSkill": {
+                    "id": 5,
+                    "identifier": 4,
+                    "name": "Berserk",
+                    "skill_type": 0,
+                    "target_type": 0,
+                    "recuperation_duration": 0,
+                    "image_url": "/imgs/skills/Skill_berserk.png",
+                    "description": "Apply a damage multiplicator to pure physical damage. Applied last"
+                },
+                "activeSkill": null,
+                "equipment": {
+                    "id": 8,
+                    "weapon": {
+                        "id": 6,
+                        "name": "",
+                        "realWeightScore": 0,
+                        "affixes": [],
+                        "baseDamage": {
+                            "id": 6,
+                            "slashDmg": 0,
+                            "bluntDmg": 1.9819732255359743,
+                            "pierceDmg": 0,
+                            "fireDmg": 0,
+                            "frostDmg": 0,
+                            "lightningDmg": 0
+                        },
+                        "baseCritRate": {
+                            "id": 12,
+                            "min": 5,
+                            "max": 10,
+                            "value": 8.607018615582025
+                        },
+                        "baseAttackSpeed": {
+                            "id": 12,
+                            "min": 5,
+                            "max": 10,
+                            "value": 8.607018615582025
+                        },
+                        "strScaling": 0.5,
+                        "intScaling": 0.5,
+                        "dexScaling": 0.5,
+                        "lckScaling": 0.5
+                    },
+                    "armor": null,
+                    "omamori": null
+                },
+                "id_w": "0874edbc-7759-11ed-839a-0baed8a73429",
+                "id_al": 174190
+            },
+            {
+                "id": 9,
+                "imageUrl": "https://s4.anilist.co/file/anilistcdn/character/large/b55133-S7lRrP0gKXpX.png",
+                "name": "Eru Chitanda",
+                "heroClass": {
+                    "id": 3,
+                    "name": "Thief",
+                    "description": "Relying mostly on dexterity",
+                    "class_icon_url": ""
+                },
+                "rank": "S",
+                "attributes": {
+                    "id": 9,
+                    "level": 1,
+                    "currentXP": 0,
+                    "xpBeforLvlUp": 6.25,
+                    "currentHP": 15,
+                    "maxHP": 15,
+                    "strength": 1,
+                    "intelligence": 2,
+                    "dexterity": 6,
+                    "luck": 2,
+                    "hpgt": 0.20000665440164878,
+                    "sgt": 0.318435450641684,
+                    "igt": 0.27262870576249976,
+                    "dgt": 0.6720656896654674,
+                    "lgt": 0.25142842875092075,
+                    "blockScore": 0,
+                    "evadeScore": 0,
+                    "blunt": 0,
+                    "pierce": 0,
+                    "slash": 0,
+                    "fire": 0,
+                    "frost": 0,
+                    "lighting": 0
+                },
+                "weaponAttack": null,
+                "uniqueSkill": {
+                    "id": 7,
+                    "identifier": 6,
+                    "name": "Fast Learner",
+                    "skill_type": 0,
+                    "target_type": 0,
+                    "recuperation_duration": 0,
+                    "image_url": "/imgs/skills/Skill_fast_learner.png",
+                    "description": "Reduction of a random (lck/dex) amount of XP to level up. Determined each time the Hero level up"
+                },
+                "activeSkill": null,
+                "equipment": {
+                    "id": 9,
+                    "weapon": {
+                        "id": 7,
+                        "name": "",
+                        "realWeightScore": 0,
+                        "affixes": [],
+                        "baseDamage": {
+                            "id": 7,
+                            "slashDmg": 0,
+                            "bluntDmg": 1.2634474636192707,
+                            "pierceDmg": 0,
+                            "fireDmg": 0,
+                            "frostDmg": 0,
+                            "lightningDmg": 0
+                        },
+                        "baseCritRate": {
+                            "id": 14,
+                            "min": 5,
+                            "max": 10,
+                            "value": 7.947141617112512
+                        },
+                        "baseAttackSpeed": {
+                            "id": 14,
+                            "min": 5,
+                            "max": 10,
+                            "value": 7.947141617112512
+                        },
+                        "strScaling": 0.5,
+                        "intScaling": 0.5,
+                        "dexScaling": 0.5,
+                        "lckScaling": 0.5
+                    },
+                    "armor": null,
+                    "omamori": null
+                },
+                "id_w": "86bee540-596a-11ed-a50a-5b5bbeb24f56",
+                "id_al": 55133
+            }
+        ]
+    },
+    "lastActionTime": "0001-01-01T00:00:00Z",
+    "ownedHeroes": [
+        {
+            "id": 8,
+            "imageUrl": "https://s4.anilist.co/file/anilistcdn/character/large/b174190-Yl9xcIc5VTtI.jpg",
+            "name": "Anna Yamada",
+            "heroClass": {
+                "id": 2,
+                "name": "Mage",
+                "description": "Relying mostly on intelligence",
+                "class_icon_url": ""
+            },
+            "rank": "S",
+            "attributes": {
+                "id": 8,
+                "level": 1,
+                "currentXP": 0,
+                "xpBeforLvlUp": 6.25,
+                "currentHP": 10,
+                "maxHP": 10,
+                "strength": 1,
+                "intelligence": 6,
+                "dexterity": 2,
+                "luck": 3,
+                "hpgt": 0.3044362391659607,
+                "sgt": 0.2199252424719642,
+                "igt": 0.8329480654669904,
+                "dgt": 0.22468717214809164,
+                "lgt": 0.3082477303858665,
+                "blockScore": 0,
+                "evadeScore": 0,
+                "blunt": 0,
+                "pierce": 0,
+                "slash": 0,
+                "fire": 0,
+                "frost": 0,
+                "lighting": 0
+            },
+            "weaponAttack": {
+                "id": 15,
+                "identifier": 16,
+                "name": "Attack",
+                "skill_type": 1,
+                "target_type": 1,
+                "recuperation_duration": 1000000000,
+                "image_url": "",
+                "description": "Attack with whatever they have in hand."
+            },
+            "uniqueSkill": {
+                "id": 5,
+                "identifier": 4,
+                "name": "Berserk",
+                "skill_type": 0,
+                "target_type": 0,
+                "recuperation_duration": 0,
+                "image_url": "/imgs/skills/Skill_berserk.png",
+                "description": "Apply a damage multiplicator to pure physical damage. Applied last"
+            },
+            "activeSkill": null,
+            "equipment": {
+                "id": 8,
+                "weapon": {
+                    "id": 6,
+                    "name": "",
+                    "realWeightScore": 0,
+                    "affixes": [],
+                    "baseDamage": {
+                        "id": 6,
+                        "slashDmg": 0,
+                        "bluntDmg": 1.9819732255359743,
+                        "pierceDmg": 0,
+                        "fireDmg": 0,
+                        "frostDmg": 0,
+                        "lightningDmg": 0
+                    },
+                    "baseCritRate": {
+                        "id": 12,
+                        "min": 5,
+                        "max": 10,
+                        "value": 8.607018615582025
+                    },
+                    "baseAttackSpeed": {
+                        "id": 12,
+                        "min": 5,
+                        "max": 10,
+                        "value": 8.607018615582025
+                    },
+                    "strScaling": 0.5,
+                    "intScaling": 0.5,
+                    "dexScaling": 0.5,
+                    "lckScaling": 0.5
+                },
+                "armor": null,
+                "omamori": null
+            },
+            "id_w": "0874edbc-7759-11ed-839a-0baed8a73429",
+            "id_al": 174190
+        },
+        {
+            "id": 9,
+            "imageUrl": "https://s4.anilist.co/file/anilistcdn/character/large/b55133-S7lRrP0gKXpX.png",
+            "name": "Eru Chitanda",
+            "heroClass": {
+                "id": 3,
+                "name": "Thief",
+                "description": "Relying mostly on dexterity",
+                "class_icon_url": ""
+            },
+            "rank": "S",
+            "attributes": {
+                "id": 9,
+                "level": 1,
+                "currentXP": 0,
+                "xpBeforLvlUp": 6.25,
+                "currentHP": 15,
+                "maxHP": 15,
+                "strength": 1,
+                "intelligence": 2,
+                "dexterity": 6,
+                "luck": 2,
+                "hpgt": 0.20000665440164878,
+                "sgt": 0.318435450641684,
+                "igt": 0.27262870576249976,
+                "dgt": 0.6720656896654674,
+                "lgt": 0.25142842875092075,
+                "blockScore": 0,
+                "evadeScore": 0,
+                "blunt": 0,
+                "pierce": 0,
+                "slash": 0,
+                "fire": 0,
+                "frost": 0,
+                "lighting": 0
+            },
+            "weaponAttack": null,
+            "uniqueSkill": {
+                "id": 7,
+                "identifier": 6,
+                "name": "Fast Learner",
+                "skill_type": 0,
+                "target_type": 0,
+                "recuperation_duration": 0,
+                "image_url": "/imgs/skills/Skill_fast_learner.png",
+                "description": "Reduction of a random (lck/dex) amount of XP to level up. Determined each time the Hero level up"
+            },
+            "activeSkill": null,
+            "equipment": {
+                "id": 9,
+                "weapon": {
+                    "id": 7,
+                    "name": "",
+                    "realWeightScore": 0,
+                    "affixes": [],
+                    "baseDamage": {
+                        "id": 7,
+                        "slashDmg": 0,
+                        "bluntDmg": 1.2634474636192707,
+                        "pierceDmg": 0,
+                        "fireDmg": 0,
+                        "frostDmg": 0,
+                        "lightningDmg": 0
+                    },
+                    "baseCritRate": {
+                        "id": 14,
+                        "min": 5,
+                        "max": 10,
+                        "value": 7.947141617112512
+                    },
+                    "baseAttackSpeed": {
+                        "id": 14,
+                        "min": 5,
+                        "max": 10,
+                        "value": 7.947141617112512
+                    },
+                    "strScaling": 0.5,
+                    "intScaling": 0.5,
+                    "dexScaling": 0.5,
+                    "lckScaling": 0.5
+                },
+                "armor": null,
+                "omamori": null
+            },
+            "id_w": "86bee540-596a-11ed-a50a-5b5bbeb24f56",
+            "id_al": 55133
+        }
+    ],
+    "discord_id": "186786755830087680"
+}

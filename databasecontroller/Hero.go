@@ -11,6 +11,17 @@ func CreateHero(hero *data.Hero) error {
 	return tx.Error
 }
 
+func SaveHero(hero *data.Hero) {
+	SaveHeroAttributes(hero.Attributes)
+	db.Save(hero)
+}
+
+func GetHeroes() []*data.Hero {
+	res := []*data.Hero{}
+	db.Find(&res)
+	return res
+}
+
 func GetHeroByID(id uint) *data.Hero {
 	var res *data.Hero
 	db.Preload("Class").

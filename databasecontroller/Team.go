@@ -2,10 +2,16 @@ package databasecontroller
 
 import "wvtrserv/data"
 
-func UpdateTeam(user *data.User) {
-	db.Model(&user.CurrentTeam).
+func UpdateTeam(team *data.Team) {
+	db.Model(&team).
 		Association("Heroes").
-		Replace(user.CurrentTeam.Heroes)
+		Replace(team.Heroes)
+}
+
+func SaveTeam(team *data.Team) {
+	for _, h := range team.Heroes {
+		SaveHero(h)
+	}
 }
 
 func GetTeam(team *data.Team) *data.Team {

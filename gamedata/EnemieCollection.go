@@ -2,8 +2,19 @@ package gamedata
 
 import "wvtrserv/data"
 
+/////////// \\\\\\\\\\\\
+/////////// \\\\\\\\\\\\
+//////////   \\\\\\\\\\\
+/////////  |  \\\\\\\\\\
+////////   |   \\\\\\\\\
+///////    0    \\\\\\\\
+/////////// \\\\\\\\\\\\
+/*     Enemies names must be unique    */
+
+const DOMAIN_NAME = "https://tama.rhiobet.sh"
+
 var GreenSlime *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/green_slime.jpg",
 	Name:     "Green slime",
 	Attributes: &data.HeroAttributes{
 		Level:        1,
@@ -18,10 +29,11 @@ var GreenSlime *data.Hero = &data.Hero{
 	Equipment: &data.HeroEquipment{
 		Weapon: SlimeAttack,
 	},
+	WeaponAttack: GetAttackSkill(),
 }
 
 var BlueSlime *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/blue_slime.jpg",
 	Name:     "Blue slime",
 	Attributes: &data.HeroAttributes{
 		Level:        1,
@@ -40,7 +52,7 @@ var BlueSlime *data.Hero = &data.Hero{
 }
 
 var RedSlime *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/red_slime.jpg",
 	Name:     "Red slime",
 	Attributes: &data.HeroAttributes{
 		Level:        1,
@@ -59,7 +71,7 @@ var RedSlime *data.Hero = &data.Hero{
 }
 
 var HornRabbit *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/horn_rabbit.png",
 	Name:     "Horn Rabbit",
 	Attributes: &data.HeroAttributes{
 		Level:        1,
@@ -76,7 +88,7 @@ var HornRabbit *data.Hero = &data.Hero{
 }
 
 var Boar *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/boar.png",
 	Name:     "Boar",
 	Attributes: &data.HeroAttributes{
 		Level:        1,
@@ -93,7 +105,7 @@ var Boar *data.Hero = &data.Hero{
 }
 
 var Wolf *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/wolf.png",
 	Name:     "Wolf",
 	Attributes: &data.HeroAttributes{
 		Level:        2,
@@ -110,7 +122,7 @@ var Wolf *data.Hero = &data.Hero{
 }
 
 var Goblin *data.Hero = &data.Hero{
-	ImageUrl: "",
+	ImageUrl: DOMAIN_NAME + "/imgs/enemies/goblin.png",
 	Name:     "Goblin",
 	Attributes: &data.HeroAttributes{
 		Level:        2,
@@ -141,3 +153,17 @@ var EnemyPool map[int][]*data.Hero = map[int][]*data.Hero{
 }
 
 var PlainPool []*data.Hero = EnemyPool[1]
+
+var EveryEnemies []*data.Hero = []*data.Hero{
+	BlueSlime,
+	GreenSlime,
+	RedSlime,
+	HornRabbit,
+	Boar,
+	Wolf,
+	Goblin,
+}
+
+func GetEveryEnemies() []*data.Hero {
+	return EveryEnemies
+}

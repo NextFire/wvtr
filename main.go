@@ -251,6 +251,23 @@ func handlerTeam(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", string(b))
 }
 
+func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
+	functionS := "[handlerExpeditionReport]"
+	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
+	ids := r.PathValue("uid")
+	id, _ := strconv.Atoi(ids)
+
+	user := databasecontroller.GetUserByID(uint(id))
+
+	b, err := json.Marshal(user.State.CurrentExpedition)
+	if err != nil {
+		logger.ErrLog.Println(err)
+		return
+	}
+	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
+	fmt.Fprintf(w, "%s", string(b))
+}
+
 func handlerAvailableExpeditions(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerAvailableExpeditions]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
@@ -293,6 +310,7 @@ func handlerSaveUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, s, http.StatusMethodNotAllowed)
 		return
 	}
+
 	user := &data.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
@@ -301,14 +319,37 @@ func handlerSaveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, err := json.Marshal(user)
+	databasecontroller.UpdateUser(user)
+	w.WriteHeader(http.StatusCreated)
+}
+
+func handlerSaveGameState(w http.ResponseWriter, r *http.Request) {
+	functionS := "[handlerSaveGameState]"
+	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
+	if r.Method != http.MethodPost {
+		s := fmt.Sprintf("Method not allowed (%s) POST expected.", r.Method)
+		logger.ErrLog.Println(s)
+		http.Error(w, s, http.StatusMethodNotAllowed)
+		return
+	}
+
+	state := &data.GameState{}
+	err := json.NewDecoder(r.Body).Decode(state)
+	if err != nil {
+		logger.ErrLog.Printf("%s Error when trying to get the user from the request body, got : %s", functionS, r.Body)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	databasecontroller.UpdateGameState(state)
+
+	b, err := json.Marshal(state)
 	if err != nil {
 		logger.ErrLog.Println(err)
 		return
 	}
 	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	databasecontroller.UpdateUser(user)
-	w.WriteHeader(http.StatusCreated)
+	fmt.Fprintf(w, "%s", string(b))
 }
 
 func handlerUpdateTeam(w http.ResponseWriter, r *http.Request) {
@@ -329,7 +370,7 @@ func handlerUpdateTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databasecontroller.UpdateTeam(user)
+	databasecontroller.UpdateTeam(user.CurrentTeam)
 	user = databasecontroller.GetUserByID(user.ID)
 	b, err := json.Marshal(user.CurrentTeam)
 	if err != nil {
@@ -397,6 +438,7 @@ func handlerLaunchExpedition(w http.ResponseWriter, r *http.Request) {
 	user := databasecontroller.GetUserByID(uint(id))
 	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier]
 	databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam))
+	databasecontroller.SaveTeam(user.CurrentTeam)
 	b, err := json.Marshal(user.State.CurrentExpedition.WhatHappened[0])
 	if err != nil {
 		logger.ErrLog.Println(err)
@@ -422,6 +464,7 @@ func main() {
 	//get
 	http.HandleFunc("/hero/{id}", handlerHero)
 	http.HandleFunc("/teams/{id}", handlerTeam)
+	http.HandleFunc("/expeditionReport/{uid}", handlerExpeditionReport)
 	http.HandleFunc("/user/{id}", handlerUser)
 	http.HandleFunc("/availableexpeditions/", handlerAvailableExpeditions)
 	http.HandleFunc("/userwaifus/{id}", handleGetPlayerWaicolleAscendedWaifus)
@@ -436,6 +479,8 @@ func main() {
 
 	//post
 	http.HandleFunc("/updateTeam/", handlerUpdateTeam)
+	http.HandleFunc("/saveUser/", handlerSaveUser)
+	http.HandleFunc("/saveGameState/", handlerSaveGameState)
 
 	// Images handler
 	http.Handle("/imgs/", http.StripPrefix("/imgs/", http.FileServer(http.Dir("imgs/"))))

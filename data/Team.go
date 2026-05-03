@@ -3,6 +3,7 @@ package data
 import (
 	"slices"
 	"time"
+	"wvtrserv/logger"
 )
 
 func (t *Team) IsDefeated() bool {
@@ -67,6 +68,7 @@ func (f FightTurnOrderTimeline) getNextAction(t time.Time) *Action {
 func (team *Team) Fight(oponent *Team, fightReport *ExpeditionStepResolveInfo) {
 	startTime := fightReport.Timeline[0].When
 
+	logger.DumpLog.Println("begin fight")
 	turnOrder := NewFightTurnOrderTimeline(*team, *oponent, startTime)
 	escapeTime := 30 * time.Minute
 	time := startTime

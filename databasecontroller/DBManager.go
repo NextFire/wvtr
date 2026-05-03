@@ -56,6 +56,7 @@ func createDB(db *gorm.DB) {
 
 	InsertSkillsInDB()
 	InsertHeroClassesInDB()
+	InsertEveryEnemiesInDB()
 }
 
 func LaunchExpedition(user *data.User, expedition *data.ExpeditionDB) {
@@ -88,13 +89,26 @@ func InsertSkillsInDB() {
 
 func InsertHeroClassesInDB() {
 	// check if there if it is necessary
-	skills := GetHeroClasses()
-	if len(skills) > 0 {
+	heroclasses := GetHeroClasses()
+	if len(heroclasses) > 0 {
 		logger.DumpLog.Println("Hero classes already inside db")
 		return
 	}
 	logger.DumpLog.Println("Insert hero classes in db")
 	for _, s := range gamedata.GetHeroClasses() {
 		CreateHeroClass(s)
+	}
+}
+
+func InsertEveryEnemiesInDB() {
+	// check if there if it is necessary
+	heroes := GetHeroes()
+	if len(heroes) > 0 {
+		logger.DumpLog.Println("Hero classes already inside db")
+		return
+	}
+	logger.DumpLog.Println("Insert enemies in db")
+	for _, s := range gamedata.GetEveryEnemies() {
+		CreateHero(s)
 	}
 }

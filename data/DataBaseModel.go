@@ -257,8 +257,8 @@ type Hero struct {
 	Equipment *HeroEquipment `json:"equipment"`
 
 	// info that we save to request nanapi if we need to.
-	WaifuID        string `gorm:"unique" json:"id_w"` // not foreign
-	AnilistCharaID uint   `json:"id_al"`              // not foreign
+	WaifuID        *string `gorm:"unique" json:"id_w"` // not foreign
+	AnilistCharaID uint    `json:"id_al"`              // not foreign
 
 	// fk
 	UserID         uint `json:"-"`

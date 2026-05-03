@@ -2,7 +2,7 @@
     import { inject } from "vue";
     import type { Hero } from "../tools/types.ts"
     import { global } from "../tools/utils.ts"
-    import { HomeStatus, NavigationHandler } from "../tools/navigationHandler.ts";
+    import { NavigationStatus, NavigationHandler } from "../tools/navigationHandler.ts";
 
     const props = defineProps<{
         hero: Hero;
@@ -10,7 +10,7 @@
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     function onClickInspectButton() {
-        navigationHandler.setHomeStatus(HomeStatus.InspectHero)
+        navigationHandler.setHomeStatus(NavigationStatus.InspectHero)
         navigationHandler.setHeroToInspect(props.hero)
     }
 </script>

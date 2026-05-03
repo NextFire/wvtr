@@ -2,6 +2,10 @@ package databasecontroller
 
 import "wvtrserv/data"
 
+func SaveHeroAttributes(a *data.HeroAttributes) {
+	db.Save(a)
+}
+
 func GetHeroAttributesByID(id uint) *data.HeroAttributes {
 	var inv *data.HeroAttributes = &data.HeroAttributes{}
 	// We can request equipment id later

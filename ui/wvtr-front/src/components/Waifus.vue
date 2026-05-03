@@ -4,22 +4,19 @@
     import type { Hero } from "../tools/types.ts"
     import { global, fetchData, RequestType, createAHeroFromAWaifu } from "../tools/utils.ts"
     import WaifuComp from "./WaifuComp.vue"
-    import { HomeStatus, NavigationHandler } from "../tools/navigationHandler.ts"
+    import { NavigationStatus, NavigationHandler } from "../tools/navigationHandler.ts"
 
-    const props = defineProps<{
-        user: User
-    }>();
-
-    let userWaifus = ref<Waifu[]|undefined>(undefined)
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
-
-    onMounted(async () => {
-        await fetchData<Waifu[]>(userWaifus, RequestType.UserWaifus, [{id: "id", value: `${props.user.id}`}]) 
-        console.log(userWaifus)
-    })
+    const userWaifus = navigationHandler.getUserWaifus()
 
     let selectedWaifu = ref<Waifu|undefined>(undefined) 
     let selectionB = ref<Record<string,string>>({})
+
+    onMounted(()=>{
+        if (userWaifus.value) {
+            fillSelectionB(userWaifus.value)
+        }
+    })
     function fillSelectionB(waifus: Waifu[]) {
         for (let i = 0; i < waifus.length; i++) {
             if (waifus[i] ==  selectedWaifu.value) {
@@ -30,37 +27,27 @@
         }
     }
 
-    watch(userWaifus, (newExp) => {
-        if (newExp) {
-            fillSelectionB(newExp)
-        }
-    })
-
     function clickOnWaifu(waifu: Waifu) {
         if (userWaifus.value) {
             if (selectedWaifu.value != waifu) {
                 selectedWaifu.value = waifu
-                fillSelectionB(userWaifus.value)
+                fillSelectionB(userWaifus.value!)
             } else {
                 selectedWaifu.value = undefined
-                fillSelectionB(userWaifus.value)
+                fillSelectionB(userWaifus.value!)
             }
         }
     }
 
-    const createdHero = ref<Hero|undefined>(undefined)
     async function onclick() {
         if (selectedWaifu.value) {
-            await createAHeroFromAWaifu(createdHero, selectedWaifu.value, props.user)
-            
+            navigationHandler.createAHeroFromAWaifu(selectedWaifu.value)
         }
     }
-    watch(createdHero, (newh) => {
-        if (newh) {
-            console.log("add h to owned h")
-            props.user.ownedHeroes.push(newh)
-            navigationHandler.setHeroToInspect(newh)
-            navigationHandler.setHomeStatus(HomeStatus.InspectHero)
+
+    watch(userWaifus, (nuw)=>{
+        if (nuw) {
+            fillSelectionB(nuw)
         }
     })
 

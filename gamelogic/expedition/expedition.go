@@ -1,27 +1,33 @@
 package expedition
 
 import (
-	"fmt"
 	"time"
 	"wvtrserv/data"
-	"wvtrserv/logger"
 )
+
+type ExpToSendToFront struct {
+	Key      string        `json:"key"`
+	ImgURL   string        `json:"imgURL"`
+	Duration time.Duration `json:"duration"`
+}
 
 type Expedition struct {
 	StartedAt time.Time
+	ImgURL    string
 	HTeam     *data.Team
 	Events    []ExpeditionEvent
 }
 
 func (e *Expedition) Solve(identifier string, pTeam *data.Team) *data.ExpeditionDB {
-	fmt.Printf("Solve expedition :\n")
 	var t time.Time = time.Now()
 	happened := make([]*data.ExpeditionStepResolveInfo, 0)
-	logger.DumpLog.Println("solving expedition: ")
 	for _, ev := range e.Events {
 		event := ev.CopyEvent()
 		happened = append(happened, event.Solve(t, pTeam))
 		t = t.Add(event.GetDuration())
+		if pTeam.IsDefeated() {
+			break
+		}
 	}
 	edb := &data.ExpeditionDB{
 		Identifier:   identifier,
@@ -38,9 +44,3 @@ func (e Expedition) GetMinimumTotalTime() time.Duration {
 	}
 	return res
 }
-
-// func (e Expedition) GetEnemyTeamForEvent(idx int) *data.Team {
-// 	event := e.Events[idx]
-// 	fight := event.(FightEvent)
-// 	return fight.ETeam
-// }
