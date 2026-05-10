@@ -44,3 +44,5 @@ main
 shell.nix
 *.db
 *.sh
+config.json
+__debug*

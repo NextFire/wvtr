@@ -20,6 +20,8 @@ import type { NavigationHandler } from "@/tools/navigationHandler.ts"
         for (let i = 0; i < e.length; i++) {
             if (e[i]!.key === selectedExp.value) {
                 selectionB.value[e[i]!.key] = "eselected"
+            } else if (!e[i]!.canBeLaunched) {
+                selectionB.value[e[i]!.key] = "cantbeselected"
             } else {
                 selectionB.value[e[i]!.key] = "enotselected"
             }
@@ -65,10 +67,19 @@ import type { NavigationHandler } from "@/tools/navigationHandler.ts"
         </div>
         <div class="column">
             <div class="row"> 
-                <div v-for="e in expeditions" v-on:click="clickOnExpedition(e.key)" :class="selectionB[e.key]">
-                    <p style="text-align: center;">{{ e.key }}</p>
-                    <p style="text-align: center;">time : {{ formatTextTimeFromTimeMS(e.duration/1000000) }}</p>
-                    <img :src="e.imgURL" width="150px">
+                <div v-for="e in expeditions" :class="selectionB[e.key]">
+                    <div v-if="e.canBeLaunched" v-on:click="clickOnExpedition(e.key)">
+                        <p style="text-align: center;">{{ e.key }}</p>
+                        <p style="text-align: center;">time : {{ formatTextTimeFromTimeMS(e.duration/1000000) }}</p>
+                        <p v-if="e.costName != ''" style="text-align: center;">Cost : {{ e.costName }} / {{ e.costNumber}} </p>
+                        <img :src="e.imgURL" width="150px">
+                    </div>
+                    <div v-else :class="selectionB[e.key]" >
+                        <p style="text-align: center;">{{ e.key }}</p>
+                        <p style="text-align: center;">time : {{ formatTextTimeFromTimeMS(e.duration/1000000) }}</p>
+                        <p v-if="e.costName != ''" style="text-align: center;">Cost : {{ e.costName }} / {{ e.costNumber}} </p>
+                        <img :src="e.imgURL" width="150px">
+                    </div>    
                 </div>
             </div>
         </div>

@@ -28,7 +28,7 @@ import InspectButton from './InspectButton.vue';
         </div>
     </div>
     <div v-else class="hero">
-        <img :src="global.DOMAIN_NAME + global.NO_IMAGE" width="150"/>
+        <img :src="global.NO_IMAGE" width="150"/>
         <div class="column">
             <h1>{{  }}<label style="font-size: medium;"> lvl.{{ 0 }}</label></h1>
             <label>hp : {{ 0 }}/{{ 0 }} </label>

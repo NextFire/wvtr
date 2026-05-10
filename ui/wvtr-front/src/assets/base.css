@@ -1,7 +1,7 @@
 .page>* {
     border: 2px solid rgb(96 139 168);
     border-radius: 5px;
-    background-color: rgb(96 139 168 / 0.2);
+    background-color: rgb(80, 102, 117);
 }
 
 .page {
@@ -12,7 +12,13 @@
 
 .header {
     flex: 1 1 auto;
-    justify-content: center;
+    /* justify-content: center; */
+    align-items: center;
+}
+
+.curencies {
+    display: inline-flex;
+    row-gap: 100px;
 }
 
 .body {
@@ -24,7 +30,7 @@
 .team>* {
     border: 2px solid rgb(96 139 168);
     border-radius: 5px;
-    background-color: rgba(168, 145, 96, 0.2);
+    background-color: rgb(219, 219, 219);
 }
 
 .team {
@@ -75,15 +81,23 @@
 .eselected {
     border: 3px solid rgb(216, 87, 87);
     border-radius: 5px;
+    background-color: #b5b5b5;
     width: 150px;
 }
 
 .enotselected {
     border: 3px solid rgb(58, 58, 58);
     border-radius: 5px;
+    background-color: #b5b5b5;
     width: 150px;
 }
 
+.cantbeselected {
+    /* border: 3px solid rgb(187, 187, 187);
+    border-radius: 5px; */
+    background-color: #636363;
+    width: 150px;
+}
 
 .waifu-image-container {
     position: relative;

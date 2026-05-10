@@ -8,10 +8,14 @@ import (
 )
 
 type NanapiConfig struct {
-	NanapiDomain   string `json:"nanapi_domain"`
-	ClientUsername string `json:"client_username"`
-	ClientSecret   string `json:"client_secret"`
-	ClientId       string `json:"client_id"`
+	NanapiDomain     string `json:"nanapi_domain"`
+	ClientUsername   string `json:"client_username"`
+	ClientSecret     string `json:"client_secret"`
+	ClientId         string `json:"client_id"`
+	DomainName       string `json:"domain_name"`
+	OIDCURL          string `json:"oidc_url"`
+	OIDCCLientId     string `json:"oidc_client_id"`
+	OIDCCLientSecret string `json:"oidc_client_secret"`
 }
 
 func (api NanapiConfig) String() string {
@@ -25,7 +29,7 @@ func GetNanapiConfig() *NanapiConfig {
 		return nanapi_config
 	}
 	nanapi_config = &NanapiConfig{}
-	configFile := "nanapi_client_config.json"
+	configFile := "config.json"
 	file, err := os.Open(configFile)
 	if err != nil {
 		logger.ErrLog.Printf("Can't open client config file (%s) : %s\n", configFile, err)

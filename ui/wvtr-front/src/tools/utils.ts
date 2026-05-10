@@ -2,17 +2,16 @@ import type { Ref } from 'vue'
 import { EncounterState, HeroTakeDamageStatus, type CurrentStepRequestMessage, type ExpeditionStepResolveInfo, type FieldActionDesc, type Hero, type User, type Waifu } from './types';
 
 class global {
-    public static readonly DOMAIN_NAME = "https://tama.rhiobet.sh";
 
-    //nanapi 
-    public static readonly NANAPI_DOMAIN = "https://https://waicolle.japan7.bde.enseeiht.fr/"
+    // connexion
+    public static readonly REQ_AUTH = "/api/oidc/auth";
 
     //Request object by id
     public static readonly REQ_HERO = "/hero/{id}";
     public static readonly REQ_TEAM = "/teams/{id}";
     public static readonly REQ_EXPEDITIONREPORT = "/expeditionReport/{uid}";
     public static readonly REQ_USR = "/user/{id}";
-    public static readonly REQ_AVAILABLEEXPEDITIONS = "/availableexpeditions/"
+    public static readonly REQ_AVAILABLEEXPEDITIONS = "/availableexpeditions/{id}"
     public static readonly REQ_CURRENTEXPEDITIONSTEP = "/currentexpeditionstep/";
 
 
@@ -51,7 +50,7 @@ enum RequestType {
 
 
 function buildRequestPath(reqType: RequestType, pathParams: { id: string; value: string }[] | undefined = undefined): string {
-    let request: string = global.DOMAIN_NAME
+    let request: string = ""
     switch (reqType) {
         case RequestType.Hero:
             request += global.REQ_HERO

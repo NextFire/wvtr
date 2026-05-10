@@ -10,6 +10,7 @@ import { inject, ref } from 'vue';
     const reportJson = JSON.stringify(report)
     async function onclick() {
         await navigationHandler.setGameState(EncounterState.Home)
+        await navigationHandler.fetchTeam()
     }
 </script>
 

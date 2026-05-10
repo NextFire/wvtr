@@ -102,3 +102,43 @@ func (team *Team) Fight(oponent *Team, fightReport *ExpeditionStepResolveInfo) {
 		fightReport.AddNewHappening(time, "The oponents have been defeated by the team.", nil)
 	}
 }
+
+func (team *Team) getHero(h *Hero) *Hero {
+	if h == nil {
+		return nil
+	}
+	for _, he := range team.Heroes {
+		if he.ID == h.ID {
+			return he
+		}
+	}
+	return nil
+}
+
+func (team *Team) ApplyESRI(esri *ExpeditionStepResolveInfo, start time.Time, until time.Time) *Team {
+	if esri == nil || len(esri.Timeline) == 0 {
+		return team
+	}
+
+	for _, tl := range esri.Timeline {
+
+		if tl.When.After(until) {
+			return team
+		}
+		if tl.When.Before(start) {
+			continue
+		}
+		if tl.WhatAction == nil {
+			continue
+		}
+		from := team.getHero(tl.WhatAction.FromH)
+		if from != nil {
+			from.Attributes.CurrentHP -= tl.WhatAction.FromPVChange
+		}
+		target := team.getHero(tl.WhatAction.TargetH)
+		if target != nil {
+			target.Attributes.CurrentHP -= tl.WhatAction.TargetPVChange
+		}
+	}
+	return team
+}

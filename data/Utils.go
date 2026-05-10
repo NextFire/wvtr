@@ -7,6 +7,14 @@ type PoolElement struct {
 	Weight float64
 }
 
+func MakeUniformArrayRates[T any](arr []T) []float64 {
+	res := make([]float64, len(arr))
+	for i := range res {
+		res[i] = 1.0
+	}
+	return res
+}
+
 func RollCheck(rollScore float64, target float64) bool {
 	return rollScore >= target
 }

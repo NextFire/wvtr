@@ -66,11 +66,11 @@ import type { NavigationHandler } from "@/tools/navigationHandler.ts";
                 <div class="raw">
                     <div v-if="hero.uniqueSkill" class="column">
                         <label>{{ hero.uniqueSkill.name }}</label>
-                        <img v-if="hero.uniqueSkill.image_url !== ''" :src="global.DOMAIN_NAME + hero.uniqueSkill.image_url"/>
+                        <img v-if="hero.uniqueSkill.image_url !== ''" :src="hero.uniqueSkill.image_url"/>
                     </div>
                     <div v-if="hero.activeSkill" class="column">
                         <label>{{ hero.activeSkill.name }}</label>
-                        <img v-if="hero.activeSkill.image_url !== ''" :src="global.DOMAIN_NAME + hero.activeSkill.image_url"/>
+                        <img v-if="hero.activeSkill.image_url !== ''" :src="hero.activeSkill.image_url"/>
                     </div>
                 </div>
             </div>

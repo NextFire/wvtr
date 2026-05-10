@@ -12,12 +12,14 @@ type ExpeditionEvent interface {
 	GetDuration() time.Duration
 	GetName() string
 	CopyEvent() ExpeditionEvent
+	GetReward() *Reward
 }
 
 type EEvent struct {
 	duration         time.Duration
 	EventSolvingInfo *data.ExpeditionStepResolveInfo
-	name             string
+	Name             string
+	Reward           *Reward
 }
 
 func (e EEvent) EndAt(startAt time.Time) time.Time {
@@ -29,5 +31,9 @@ func (e EEvent) GetDuration() time.Duration {
 }
 
 func (e EEvent) GetName() string {
-	return e.name
+	return e.Name
+}
+
+func (e EEvent) GetReward() *Reward {
+	return e.Reward
 }

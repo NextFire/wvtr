@@ -13,10 +13,15 @@ func GetExpeditionDBByID(id uint) *data.ExpeditionDB {
 	var ex *data.ExpeditionDB = &data.ExpeditionDB{}
 	// We can request equipment id later
 	db.Preload("WhatHappened").
+		Preload("ExpeditionRewards").
 		Find(&ex, id)
 
 	for i := range ex.WhatHappened {
 		ex.WhatHappened[i] = GetExpeditionStepResolveInfoByID(ex.WhatHappened[i].ID)
+	}
+
+	if ex.ExpeditionRewards != nil {
+		ex.ExpeditionRewards = GetGetRewardByID(ex.ExpeditionRewards.ID)
 	}
 	return ex
 }

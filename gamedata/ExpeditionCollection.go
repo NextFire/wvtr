@@ -1,33 +1,17 @@
 package gamedata
 
 import (
-	"time"
 	"wvtrserv/data"
 	"wvtrserv/gamelogic/expedition"
 )
 
-var traval30s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*30, "Travel")
-var traval40s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*40, "Travel")
-var traval10s expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*10, "Travel")
-var goingToPlains expedition.ExpeditionEvent = expedition.NewTravelEvent(time.Second*30, "Going to the plains")
-var plainFight expedition.ExpeditionEvent = expedition.NewFightEvent(PlainPool, "Plain fight")
-
-var nothing10s expedition.ExpeditionEvent = expedition.NewNeutralEvent(time.Second*10, "Neutral",
-	expedition.HappeningType(func(t *data.Team, e *data.ExpeditionStepResolveInfo) {}))
-
-var selfTraining expedition.ExpeditionEvent = expedition.NewNeutralEvent(time.Second*30, "Self training (30 minutes)",
-	expedition.HappeningType(func(t *data.Team, e *data.ExpeditionStepResolveInfo) {
-		for _, h := range t.Heroes {
-			h.GainXP(5)
-			e.AddNewHappening(time.Now(), h.Name+" Gained 5 xp points.", nil)
-		}
-	}))
-
 var Expeditions = map[string]expedition.Expedition{
-	"Travel 30 sec": {
-		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
+	"Cost(10g) heal": {
+		ImgURL:     DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
+		Cost:       allCurrencies[data.Gold],
+		CostNumber: 10,
 		Events: []expedition.ExpeditionEvent{
-			traval30s,
+			testsmallRest1,
 		},
 	},
 	"Travel 40 sec": {
@@ -36,11 +20,10 @@ var Expeditions = map[string]expedition.Expedition{
 			traval40s,
 		},
 	},
-	"Travel and do nothing": {
+	"Rest": {
 		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
-			traval10s,
-			nothing10s,
+			testsmallRest1,
 		},
 	},
 	"Plain quest": {
@@ -59,13 +42,23 @@ var Expeditions = map[string]expedition.Expedition{
 	},
 }
 
-func GetAvailableExpeditions() []*expedition.ExpToSendToFront {
+func GetAvailableExpeditions(user *data.User) []*expedition.ExpToSendToFront {
 	res := make([]*expedition.ExpToSendToFront, 0)
+
 	for k, v := range Expeditions {
+		name := ""
+		cbl := true
+		if v.Cost != nil {
+			name = v.Cost.GetName()
+			cbl = user.Inventory.IsInInventory(v.Cost, v.CostNumber)
+		}
 		res = append(res, &expedition.ExpToSendToFront{
-			Key:      k,
-			ImgURL:   v.ImgURL,
-			Duration: v.GetMinimumTotalTime(),
+			Key:           k,
+			ImgURL:        v.ImgURL,
+			Duration:      v.GetMinimumTotalTime(),
+			CostName:      name,
+			CostNumber:    v.CostNumber,
+			CanBeLaunched: cbl,
 		})
 	}
 	return res

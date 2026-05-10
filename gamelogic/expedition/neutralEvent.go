@@ -5,7 +5,7 @@ import (
 	"wvtrserv/data"
 )
 
-type HappeningType func(*data.Team, *data.ExpeditionStepResolveInfo)
+type HappeningType func(ExpeditionEvent, *data.Team, *data.ExpeditionStepResolveInfo)
 
 /***********************/
 /***  Neutral Event  ***/
@@ -15,11 +15,12 @@ type NeutralEvent struct {
 	Happening HappeningType
 }
 
-func NewNeutralEvent(duration time.Duration, name string, h HappeningType) *NeutralEvent {
+func NewNeutralEvent(duration time.Duration, name string, rewardPool *RewardPool, h HappeningType) *NeutralEvent {
 	return &NeutralEvent{
 		EEvent: EEvent{
 			duration: duration,
-			name:     name,
+			Name:     name,
+			Reward:   NewReward(rewardPool),
 		},
 		Happening: h,
 	}
@@ -29,11 +30,11 @@ func (e NeutralEvent) GetEventType() data.EncounterState {
 	return data.Neutral
 }
 
-func (e NeutralEvent) Solve(startAt time.Time, t *data.Team) *data.ExpeditionStepResolveInfo {
+func (e *NeutralEvent) Solve(startAt time.Time, t *data.Team) *data.ExpeditionStepResolveInfo {
 	resExp := data.NewExpeditionResolveInfo(e.GetEventType())
 
 	resExp.AddNewHappening(startAt, "Traveling Start", nil)
-	e.Happening(t, resExp)
+	e.Happening(e, t, resExp)
 	resExp.AddNewHappening(startAt.Add(e.duration), "Traveling End", nil)
 
 	return resExp
@@ -44,7 +45,8 @@ func (e NeutralEvent) CopyEvent() ExpeditionEvent {
 		EEvent: EEvent{
 			duration:         e.duration,
 			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
-			name:             e.name,
+			Name:             e.Name,
+			Reward:           e.Reward,
 		},
 		Happening: e.Happening,
 	}

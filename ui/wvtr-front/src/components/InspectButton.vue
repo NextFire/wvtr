@@ -17,6 +17,6 @@
 
 <template>
     <button class="inspection-button" v-on:click="onClickInspectButton()">
-        <img :src="global.DOMAIN_NAME + '/imgs/magnifyingglassicon.png'" width="25px"/>
+        <img :src="'/imgs/magnifyingglassicon.png'" width="25px"/>
     </button>
 </template>

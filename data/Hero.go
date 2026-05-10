@@ -68,6 +68,7 @@ func (h *Hero) IncreaseAttributeWithRate() {
 	grs := h.Attributes.GetGRArray()
 	for i := range len(grs) {
 		// this is in case the proba is above 100%
+		// we add the int part and rand on the float part
 		toadd := float64(int(grs[i]))
 		proba := grs[i] - toadd
 		if RollCheck(NaturalRoll(0, 1), 1-proba) {
@@ -194,6 +195,18 @@ func (h *Hero) Block(from *Hero) bool {
 
 func (h *Hero) IsCrit() bool {
 	return h.RollCheck(h.Equipment.Weapon.BaseCritRate.Value)
+}
+
+func (h *Hero) Rest(heal float64) float64 {
+	actualHeal := heal
+	if h.HasUniqueSkill(GoodRest) {
+		actualHeal = heal * 1.33
+	}
+	if h.Attributes.CurrentHP+actualHeal >= h.Attributes.MaxHP {
+		actualHeal = h.Attributes.MaxHP - h.Attributes.CurrentHP
+	}
+	h.Attributes.CurrentHP += actualHeal
+	return actualHeal
 }
 
 func (h *Hero) TakeDamage(dmg *Damage, takeFrom *Hero, fad *FieldActionDesc) *FieldActionDesc {

@@ -9,11 +9,12 @@ type TravelEvent struct {
 	EEvent
 }
 
-func NewTravelEvent(duration time.Duration, name string) *TravelEvent {
+func NewTravelEvent(duration time.Duration, name string, rewardPool *RewardPool) *TravelEvent {
 	return &TravelEvent{
 		EEvent{
 			duration: duration,
-			name:     name,
+			Name:     name,
+			Reward:   NewReward(rewardPool),
 		},
 	}
 }
@@ -36,7 +37,8 @@ func (e TravelEvent) CopyEvent() ExpeditionEvent {
 		EEvent: EEvent{
 			duration:         e.duration,
 			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
-			name:             e.name,
+			Name:             e.Name,
+			Reward:           e.Reward,
 		},
 	}
 }

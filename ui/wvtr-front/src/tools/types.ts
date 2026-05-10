@@ -43,6 +43,13 @@ enum EncounterState {
     Error,
 }
 
+enum CurrencyType {
+    Gold = 0,
+    MScrap,
+    LSCrap,
+    CScrap,
+}
+
 type Damage = {
     slashDmg: number,
     bluntDmg: number,
@@ -68,9 +75,15 @@ type Storable = {
     name: string,
 }
 
-type Usable = Storable & {
-    stackSize: number,
-    description: string,
+type Currency = {
+    type: CurrencyType,
+    name: string,
+    iconURL: string,
+}
+
+type CurrencyOwned = {
+    numberOwned: number,
+    currency: Currency,
 }
 
 type Equipable = Storable & {
@@ -104,6 +117,7 @@ type Inventory = {
     weapons: Weapon[]
     armors: Armor[]
     omamoris: Omamori[]
+    currencies: CurrencyOwned[]
 }
 
 type HeroAttributes = {
@@ -146,6 +160,11 @@ type HeroClass = {
     class_icon_url: string
 }
 
+type Reward = {
+    xp: number,
+    loot: Inventory,
+}
+
 type FieldActionDesc = {
     fromH: Hero
     usedSKill: Skill
@@ -171,12 +190,16 @@ type ExpToGetFromBack = {
     key: string,
     imgURL: string,
     duration: number,
+    costName: string,
+    costNumber: number,
+    canBeLaunched: boolean,
 }
 
 type ExpeditionDB = {
     identifier: string,
     startedAt: string,
     whatHappened: ExpeditionStepResolveInfo[],
+    ExpeditionRewards: Reward,
 }
 
 type GameState = {

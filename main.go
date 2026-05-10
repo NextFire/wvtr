@@ -17,11 +17,9 @@ import (
 	"wvtrserv/gamelogic/expedition"
 	"wvtrserv/logger"
 	"wvtrserv/nanapi/client"
+	"wvtrserv/nanapi/config"
 	"wvtrserv/utils"
 )
-
-const DOMAIN_NAME = "https://tama.rhiobet.sh"
-const AUTH_SERVER = "https://auth.japan7.bde.enseeiht.fr"
 
 // Main page ?
 // func handler(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +52,7 @@ type UserToken struct {
 var authEndPoints *AuthEndpoints = &AuthEndpoints{}
 
 func fetchAuthEndpoints() {
-	resp := utils.Fetch(AUTH_SERVER+"/.well-known/openid-configuration", "GET", url.Values{}, []string{"Content-Type", "application/json"})
+	resp := utils.Fetch(config.GetNanapiConfig().OIDCURL+"/.well-known/openid-configuration", "GET", url.Values{}, []string{"Content-Type", "application/json"})
 	if resp == nil {
 		return
 	}
@@ -76,6 +74,21 @@ type DiscordAccount struct {
 	DiscordID string `json:"discord_id"`
 }
 
+func handlerAuth(w http.ResponseWriter, r *http.Request) {
+	functionS := "[handlerAuth]"
+	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
+
+	// Example usage
+	tokenEndpoint := authEndPoints.AuthorizationEndpoint
+	logger.DumpLog.Println(tokenEndpoint)
+	params := url.Values{}
+	params.Add("response_type", "code")
+	params.Add("client_id", config.GetNanapiConfig().OIDCCLientId)
+	params.Add("redirect_uri", config.GetNanapiConfig().DomainName+"/api/oidc/callback")
+	params.Add("scope", "openid profile discord_id")
+	http.Redirect(w, r, tokenEndpoint+"?"+params.Encode(), 302)
+}
+
 // Connexion
 func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerConnexion]"
@@ -84,8 +97,8 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	// logger.DumpLog.Print(r)
 	code := r.URL.Query().Get("code")
 	logger.DumpLog.Println(code)
-	clientId := "japan7"
-	clientSecret := "nihongo"
+	clientId := config.GetNanapiConfig().OIDCCLientId
+	clientSecret := config.GetNanapiConfig().OIDCCLientSecret
 
 	// Example usage
 	tokenEndpoint := authEndPoints.TokenEndPoint
@@ -96,7 +109,7 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	params.Add("code", code)
 	params.Add("client_id", clientId)
 	params.Add("client_secret", clientSecret)
-	params.Add("redirect_uri", DOMAIN_NAME+"/api/oidc/callback")
+	params.Add("redirect_uri", config.GetNanapiConfig().DomainName+"/api/oidc/callback")
 
 	header := []string{"Content-Type", "application/x-www-form-urlencoded"}
 	logger.DumpLog.Println(params.Encode())
@@ -128,11 +141,13 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	// this means it's the first time the user arrive here.
 	// and we need to create a new user based on the discord account info
 	if user.DiscordID == "" {
+		c := data.NewCurrencyOwned(databasecontroller.GetAllCurrencies())
 		user = &data.User{
 			Name: discordAccount.Name,
 			CurrentTeam: &data.Team{
 				Heroes: make([]*data.Hero, 0),
 			},
+			Inventory:   data.NewInventory(c),
 			OwnedHeroes: make([]*data.Hero, 0),
 			State: &data.GameState{
 				State: data.Home,
@@ -140,18 +155,19 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 			DiscordID: discordAccount.DiscordID,
 		}
 		databasecontroller.CreateNewUser(user)
+		logger.DumpLog.Println("Test")
 		user = databasecontroller.GetUserByDiscordID(discordAccount.DiscordID)
 	}
 
 	redirectParams := url.Values{}
 	redirectParams.Add("wvtrusrid", fmt.Sprintf("%d", user.ID))
 
-	redReq, err := http.NewRequest("POST", DOMAIN_NAME, strings.NewReader(redirectParams.Encode()))
+	redReq, err := http.NewRequest("POST", config.GetNanapiConfig().DomainName, strings.NewReader(redirectParams.Encode()))
 	if err != nil {
 		logger.ErrLog.Println(err)
 		return
 	}
-	reqPath := DOMAIN_NAME + "?" + redirectParams.Encode()
+	reqPath := config.GetNanapiConfig().DomainName + "?" + redirectParams.Encode()
 	logger.DumpLog.Println(reqPath)
 	http.Redirect(w, redReq, reqPath, http.StatusSeeOther)
 }
@@ -258,6 +274,9 @@ func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(ids)
 
 	user := databasecontroller.GetUserByID(uint(id))
+	exp := user.State.CurrentExpedition
+	user.GetReward(exp.ExpeditionRewards)
+	databasecontroller.UpdateUser(user)
 
 	b, err := json.Marshal(user.State.CurrentExpedition)
 	if err != nil {
@@ -271,8 +290,11 @@ func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
 func handlerAvailableExpeditions(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerAvailableExpeditions]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
+	ids := r.PathValue("id")
+	id, _ := strconv.Atoi(ids)
+	user := databasecontroller.GetUserByID(uint(id))
 
-	expeditions := gamedata.GetAvailableExpeditions()
+	expeditions := gamedata.GetAvailableExpeditions(user)
 
 	b, err := json.Marshal(expeditions)
 	if err != nil {
@@ -410,6 +432,7 @@ func handlerCurrentExpeditionStep(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := databasecontroller.UpdateGameStateWithTime(user.State, &t)
+	databasecontroller.UpdateTeamWithExpAndTime(user.CurrentTeam, *user.State.CurrentExpedition, t)
 	databasecontroller.UpdateGameState(user.State)
 
 	resS := "{}"
@@ -437,15 +460,20 @@ func handlerLaunchExpedition(w http.ResponseWriter, r *http.Request) {
 
 	user := databasecontroller.GetUserByID(uint(id))
 	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier]
-	databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam))
-	databasecontroller.SaveTeam(user.CurrentTeam)
-	b, err := json.Marshal(user.State.CurrentExpedition.WhatHappened[0])
-	if err != nil {
-		logger.ErrLog.Println(err)
+	if exp.CanEnter(user) && user.Inventory.Remove(exp.Cost, exp.CostNumber) {
+		databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam))
+		//databasecontroller.SaveTeam(user.CurrentTeam)
+		b, err := json.Marshal(user.State.CurrentExpedition.WhatHappened[0])
+		if err != nil {
+			logger.ErrLog.Println(err)
+			return
+		}
+		logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
+		fmt.Fprintf(w, "%s", string(b))
 		return
 	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+
+	fmt.Fprintf(w, "Can't launch expedition")
 }
 
 func main() {
@@ -458,6 +486,7 @@ func main() {
 	//http.HandleFunc("/", handleMainPage)
 
 	// Connexion
+	http.HandleFunc("/api/oidc/auth", handlerAuth)
 	http.HandleFunc("/api/oidc/callback", handlerConnexion)
 
 	// Request object by ID.
@@ -466,7 +495,7 @@ func main() {
 	http.HandleFunc("/teams/{id}", handlerTeam)
 	http.HandleFunc("/expeditionReport/{uid}", handlerExpeditionReport)
 	http.HandleFunc("/user/{id}", handlerUser)
-	http.HandleFunc("/availableexpeditions/", handlerAvailableExpeditions)
+	http.HandleFunc("/availableexpeditions/{id}", handlerAvailableExpeditions)
 	http.HandleFunc("/userwaifus/{id}", handleGetPlayerWaicolleAscendedWaifus)
 
 	//post
@@ -499,54 +528,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-// test
-// func main() {
-// 	databasecontroller.DBLogIn()
-
-// 	testH1 := &client.JoinWC{
-// 		NameUserPreferred: "testH1",
-// 		Rank:              "S",
-// 	}
-
-// 	testH2 := &client.JoinWC{
-// 		NameUserPreferred: "testH2",
-// 		Rank:              "S",
-// 	}
-
-// 	testH3 := &client.JoinWC{
-// 		NameUserPreferred: "testH3",
-// 		Rank:              "S",
-// 	}
-
-// 	classes := databasecontroller.GetHeroClasses()
-// 	skills := databasecontroller.GetSkills()
-
-// 	H1 := gamedata.CreateNewHeroFromDBWaifuInfos(testH1, classes, skills)
-// 	H1.Equipment.Weapon = data.CreateWeapon(gamedata.SwordBase)
-
-// 	H2 := gamedata.CreateNewHeroFromDBWaifuInfos(testH2, classes, skills)
-// 	H2.Equipment.Weapon = data.CreateWeapon(gamedata.DaggerBase)
-
-// 	H3 := gamedata.CreateNewHeroFromDBWaifuInfos(testH3, classes, skills)
-// 	H3.Equipment.Weapon = data.CreateWeapon(gamedata.HammerBase)
-
-// 	HTeam := &data.Team{
-// 		Heroes: []*data.Hero{H1, H2, H3},
-// 	}
-
-// 	ETeam := &data.Team{
-// 		Heroes: []*data.Hero{gamedata.RedSlime, gamedata.BlueSlime, gamedata.GreenSlime},
-// 	}
-// 	ETeam.Heroes[0].ClearAllStatusAndSetToFullLife()
-// 	ETeam.Heroes[0].WeaponAttack = gamedata.GetAttackSkill()
-// 	ETeam.Heroes[1].ClearAllStatusAndSetToFullLife()
-// 	ETeam.Heroes[1].WeaponAttack = gamedata.GetAttackSkill()
-// 	ETeam.Heroes[2].ClearAllStatusAndSetToFullLife()
-// 	ETeam.Heroes[2].WeaponAttack = gamedata.GetAttackSkill()
-
-// 	finfo := &data.ExpeditionStepResolveInfo{}
-// 	finfo.AddNewHappening(time.Now(), "begin", nil)
-// 	HTeam.Fight(ETeam, finfo)
-// 	logger.DumpLog.Print(finfo.String())
-// }

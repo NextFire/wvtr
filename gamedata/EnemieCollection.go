@@ -11,8 +11,6 @@ import "wvtrserv/data"
 /////////// \\\\\\\\\\\\
 /*     Enemies names must be unique    */
 
-const DOMAIN_NAME = "https://tama.rhiobet.sh"
-
 var GreenSlime *data.Hero = &data.Hero{
 	ImageUrl: DOMAIN_NAME + "/imgs/enemies/green_slime.jpg",
 	Name:     "Green slime",
@@ -152,7 +150,7 @@ var EnemyPool map[int][]*data.Hero = map[int][]*data.Hero{
 	},
 }
 
-var PlainPool []*data.Hero = EnemyPool[1]
+var EnemyPlainPool []*data.Hero = EnemyPool[1]
 
 var EveryEnemies []*data.Hero = []*data.Hero{
 	BlueSlime,

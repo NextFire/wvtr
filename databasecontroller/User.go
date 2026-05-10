@@ -8,6 +8,7 @@ import (
 func CreateNewUser(user *data.User) *data.User {
 	logger.DumpLog.Print("CreateNewUser")
 	db.Create(user)
+	logger.DumpLog.Print("test")
 	return user
 }
 

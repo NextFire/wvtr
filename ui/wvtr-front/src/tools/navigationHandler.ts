@@ -63,20 +63,7 @@ async function setupCookieWithUserID($cookies: VueCookies, uid: number) {
 }
 
 async function requestToAuth($cookies: VueCookies) {
-    const authServer = "https://auth.japan7.bde.enseeiht.fr";
-    const client_id = ref<string>("japan7")
-
-    const resp = await fetch(`${authServer}/.well-known/openid-configuration`);
-    const config = await resp.json();
-    console.log("uidfcookie = " + getUserIdFromCookies($cookies!))
-    console.log(config);
-    const params = new URLSearchParams();
-    params.set("response_type", "code");
-    params.set("client_id", client_id.value);
-    params.set("redirect_uri", `${global.DOMAIN_NAME}/api/oidc/callback`);
-    params.set("scope", "openid profile discord_id");
-    authUrl.value = `${config.authorization_endpoint}?${params.toString()}`;
-    window.location.replace(authUrl.value);
+    window.location.replace(global.REQ_AUTH);
 }
 
 class NavigationHandler {
@@ -95,7 +82,7 @@ class NavigationHandler {
     }
 
     async fetchAvailableExpedition() {
-        await fetchData<ExpToGetFromBack[]>(this.availableExpedition, RequestType.AvailableExpeditions)
+        await fetchData<ExpToGetFromBack[]>(this.availableExpedition, RequestType.AvailableExpeditions, [{ id: "id", value: `${this.user.value!.id}` }])
     }
 
     async fetchCurrentExpeditionStepResolveInfo(usreid: number) {
@@ -109,6 +96,13 @@ class NavigationHandler {
     async fetchUserWaifus() {
         await fetchData<Waifu[]>(this.userWaifus, RequestType.UserWaifus, [{ id: "id", value: `${this.user.value!.id}` }])
         return this.userWaifus
+    }
+
+    async fetchTeam() {
+        let response = ref<Team | undefined>(undefined)
+        await fetchData<Team>(response, RequestType.Team, [{ id: "id", value: `${this.user.value!.currentTeam.id}` }])
+
+        this.user.value!.currentTeam! = response.value!
     }
 
     async fetchExpeditionReport() {
@@ -211,7 +205,7 @@ class NavigationHandler {
             $cookies.set(cookieKey, uidstring, '30d', undefined, undefined, true, "Strict")
 
             // redirect to the main page 
-            window.location.replace(global.DOMAIN_NAME);
+            window.location.replace("/");
         } else if ($cookies && isUserIdInCookies($cookies)) { // client has been connected once, but we need to check if it matches the database
             await fetchData<User>(this.user, RequestType.User, [{ id: "id", value: `${getUserIdFromCookies($cookies)}` }])
             if (this.user.value != undefined) {

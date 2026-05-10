@@ -51,16 +51,26 @@ type Affix struct {
 
 type Storable struct {
 	ModelBase
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	IconURL string `json:"iconURL"`
 
 	// fk
 	InventoryID uint `json:"-"`
 }
 
-type Usable struct {
+type Currency struct {
 	Storable
-	StackSize   uint   `json:"stackSize"`
-	Description string `json:"description"`
+	Type CurrencyType `json:"type"`
+}
+
+type CurrencyOwned struct {
+	ModelBase
+	NumberOwned int       `json:"numberOwned"`
+	Currency    *Currency `json:"currency"`
+
+	// fk
+	CurrencyID  uint `json:"-"`
+	InventoryID uint `json:"-"`
 }
 
 type Equipable struct {
@@ -95,7 +105,6 @@ type Omamori struct {
 
 type HeroEquipment struct {
 	ModelBase
-
 	Weapon  *Weapon  `json:"weapon"`
 	Armor   *Armor   `json:"armor"`
 	Omamori *Omamori `json:"omamori"`
@@ -108,9 +117,10 @@ type HeroEquipment struct {
 
 type Inventory struct {
 	ModelBase
-	Weapons  []*Weapon  `json:"weapons"`
-	Armors   []*Armor   `json:"armors"`
-	Omamoris []*Omamori `json:"omamoris"`
+	Weapons    []*Weapon        `json:"weapons"`
+	Armors     []*Armor         `json:"armors"`
+	Omamoris   []*Omamori       `json:"omamoris"`
+	Currencies []*CurrencyOwned `json:"currencies"`
 }
 
 type HeroAttributes struct {
@@ -149,6 +159,15 @@ type HeroAttributes struct {
 
 	// fk
 	HeroID uint `json:"-"`
+}
+
+type Reward struct {
+	ModelBase
+	XP   float64    `json:"xp"`
+	Loot *Inventory `json:"loot"`
+
+	// fk
+	LootID uint `json:"-"`
 }
 
 type FieldActionDesc struct {
@@ -190,9 +209,13 @@ type ExpeditionStepResolveInfo struct {
 
 type ExpeditionDB struct {
 	ModelBase
-	Identifier   string                       `json:"identifier"`
-	StartedAt    time.Time                    `json:"startedAt"`
-	WhatHappened []*ExpeditionStepResolveInfo `json:"whatHappened"`
+	Identifier        string                       `json:"identifier"`
+	StartedAt         time.Time                    `json:"startedAt"`
+	WhatHappened      []*ExpeditionStepResolveInfo `json:"whatHappened"`
+	ExpeditionRewards *Reward                      `json:"ExpeditionRewards"`
+
+	// fk
+	ExpeditionRewardsID uint `json:"-"`
 }
 
 type GameState struct {
@@ -294,21 +317,22 @@ var DBSchema []any = []any{
 	&Damage{},
 	&StatsRange{},
 	&Affix{},
-	&Storable{},
-	&Usable{},
+	&Currency{},
+	&CurrencyOwned{},
 	&Weapon{},
 	&Armor{},
 	&Omamori{},
-	&Skill{},
 	&HeroEquipment{},
 	&Inventory{},
 	&HeroAttributes{},
+	&Reward{},
 	&FieldActionDesc{},
 	&ExpeditionStepTimestamp{},
 	&ExpeditionStepResolveInfo{},
 	&ExpeditionDB{},
 	&GameState{},
 	&HeroClass{},
+	&Skill{},
 	&Hero{},
 	&Team{},
 	&User{},

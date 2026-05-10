@@ -21,7 +21,7 @@ func CreateNewHeroFromDBWaifuInfos(wc *client.JoinWC, classes []*data.HeroClass,
 		WaifuID:        &wc.ID,
 		AnilistCharaID: uint(wc.IdAl),
 		Equipment: &data.HeroEquipment{
-			Weapon: data.CreateWeapon(FistBase),
+			Weapon: FistBase.GenEquipment().(*data.Weapon),
 		},
 	}
 

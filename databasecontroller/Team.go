@@ -1,6 +1,9 @@
 package databasecontroller
 
-import "wvtrserv/data"
+import (
+	"time"
+	"wvtrserv/data"
+)
 
 func UpdateTeam(team *data.Team) {
 	db.Model(&team).
@@ -30,4 +33,23 @@ func GetTeamByID(id uint) *data.Team {
 	}
 
 	return res
+}
+
+func UpdateTeamWithExpAndTime(team *data.Team, expdb data.ExpeditionDB, t time.Time) {
+	// get array of all esri to apply between last update and t
+	timeStart := team.UpdatedAt
+	timeEnd := t
+	timeIntervalStartIdx := GetCurrentExpeditionStepIdx(expdb, &timeStart)
+	timeIntervalEnd := GetCurrentExpeditionStepIdx(expdb, &timeEnd)
+	if timeIntervalEnd < len(expdb.WhatHappened) {
+		timeIntervalEnd++
+	}
+
+	toApply := expdb.WhatHappened[timeIntervalStartIdx:timeIntervalEnd]
+
+	for _, a := range toApply {
+		team = team.ApplyESRI(a, timeStart, timeEnd)
+	}
+
+	SaveTeam(team)
 }

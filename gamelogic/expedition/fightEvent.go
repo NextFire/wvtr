@@ -10,11 +10,12 @@ type FightEvent struct {
 	EnemyPool []*data.Hero
 }
 
-func NewFightEvent(areaEnemyPool []*data.Hero, name string) *FightEvent {
+func NewFightEvent(areaEnemyPool []*data.Hero, name string, rewardPool *RewardPool) *FightEvent {
 	res := &FightEvent{
 		EEvent: EEvent{
 			duration: 0,
-			name:     name,
+			Name:     name,
+			Reward:   NewReward(rewardPool),
 		},
 		EnemyPool: areaEnemyPool,
 	}
@@ -50,6 +51,9 @@ func (e *FightEvent) Solve(startAt time.Time, heroTeam *data.Team) *data.Expedit
 	heroTeam.Fight(resExp.ETeam, resExp)
 	e.duration = resExp.GetDuration()
 	resExp.AddNewHappening(startAt.Add(e.GetDuration()), "Fight End", nil)
+	if !heroTeam.IsDefeated() {
+		e.Reward.GenRandomReward()
+	}
 	return resExp
 }
 
@@ -58,32 +62,23 @@ func (e FightEvent) CopyEvent() ExpeditionEvent {
 		EEvent: EEvent{
 			duration:         e.duration,
 			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
-			name:             e.name,
+			Name:             e.Name,
+			Reward:           e.Reward,
 		},
 		EnemyPool: e.EnemyPool,
 	}
 }
 
-// func Fight(heroTeam *data.Team, enemyTeam *data.Team, infos *data.ExpeditionStepResolveInfo) {
-// 	startTime := infos.Timeline[0].When
+func xpToGainFromBeatingEnemy(e *data.Hero) float64 {
+	x := float64(e.Attributes.Level)
+	return x + (e.RollNumber(0, x/2))
+}
 
-// 	turnOrder := NewFightTurnOrderTimeline(*heroTeam, *enemyTeam, startTime)
-// 	escapeTime := 30 * time.Minute
-// 	time := startTime
-// 	for !heroTeam.IsDefeated() && !enemyTeam.IsDefeated() {
-// 		if turnOrder.fightTotalDuration(startTime) < escapeTime {
-// 			// too long, the team escape
-// 			return
-// 		}
-// 		a := turnOrder.getNextAction(time)
-// 		recupTime := a.Who.Play(heroTeam, enemyTeam)
-// 		turnOrder.addAction(&Action{
-// 			When: a.When.Add(recupTime),
-// 			Who:  a.Who,
-// 		})
-// 		time = a.When
-// 	}
-
-// 	// while !fightFinished
-// 	// Initiativelist[current]
-// }
+func (e FightEvent) GenRewards(eTeam *data.Team) {
+	for _, h := range eTeam.Heroes {
+		e.Reward.AddXP(xpToGainFromBeatingEnemy(h))
+	}
+	for data.RollCheck(data.NaturalRoll(0, 1), e.Reward.LootChance) {
+		e.Reward.GenRandomReward()
+	}
+}

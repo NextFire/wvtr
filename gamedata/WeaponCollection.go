@@ -2,6 +2,8 @@ package gamedata
 
 import "wvtrserv/data"
 
+var weaponsImgsPath string = DOMAIN_NAME + "/imgs/equipments/weapons/"
+
 // bases
 var SwordBase *data.WeaponBase = &data.WeaponBase{
 	BaseDamagesRange: map[data.DamageType]*data.StatsRange{
@@ -10,6 +12,8 @@ var SwordBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 7},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Sword",
+		IconURL:  weaponsImgsPath + "sword_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -31,6 +35,8 @@ var HammerBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 10},
 	BaseCritRate:    &data.StatsRange{Min: 0, Max: 1},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Hammer",
+		IconURL:  weaponsImgsPath + "hammer_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -52,6 +58,8 @@ var SpearBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 6},
 	BaseCritRate:    &data.StatsRange{Min: 6, Max: 12},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Spear",
+		IconURL:  weaponsImgsPath + "spear_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -74,6 +82,8 @@ var DaggerBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 3, Max: 5},
 	BaseCritRate:    &data.StatsRange{Min: 15, Max: 25},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Dagger",
+		IconURL:  weaponsImgsPath + "dagger_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -95,6 +105,8 @@ var BowBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 4, Max: 8},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Bow",
+		IconURL:  weaponsImgsPath + "bow_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -116,6 +128,8 @@ var FistBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 10},
 	BaseCritRate:    &data.StatsRange{Min: 0, Max: 0.5},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Fist",
+		IconURL:  weaponsImgsPath + "fist_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -137,6 +151,8 @@ var TuskBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 5, Max: 15},
 	BaseCritRate:    &data.StatsRange{Min: 7, Max: 10},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Tusk",
+		IconURL:  weaponsImgsPath + "tusk_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -158,6 +174,8 @@ var ClawBase *data.WeaponBase = &data.WeaponBase{
 	BaseAttackSpeed: &data.StatsRange{Min: 4, Max: 8},
 	BaseCritRate:    &data.StatsRange{Min: 5, Max: 10},
 	EquipableBase: data.EquipableBase{
+		BaseName: "Claw",
+		IconURL:  weaponsImgsPath + "claw_icon.png",
 		AffixesPool: []*data.Affix{
 			PercentRecupSpeed[1],
 			FlatPhysicalDamage[1],
@@ -173,8 +191,8 @@ var ClawBase *data.WeaponBase = &data.WeaponBase{
 }
 
 // Weapon
-var GoblinSword *data.Weapon = data.CreateWeapon(SwordBase)
-var WolfClaw *data.Weapon = data.CreateWeapon(ClawBase)
-var BoarTusk *data.Weapon = data.CreateWeapon(TuskBase)
-var SlimeAttack *data.Weapon = data.CreateWeapon(FistBase)
-var RabbitHorn *data.Weapon = data.CreateWeapon(TuskBase)
+var GoblinSword *data.Weapon = SwordBase.GenEquipment().(*data.Weapon)
+var WolfClaw *data.Weapon = ClawBase.GenEquipment().(*data.Weapon)
+var BoarTusk *data.Weapon = TuskBase.GenEquipment().(*data.Weapon)
+var SlimeAttack *data.Weapon = FistBase.GenEquipment().(*data.Weapon)
+var RabbitHorn *data.Weapon = TuskBase.GenEquipment().(*data.Weapon)
