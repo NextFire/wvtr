@@ -8,7 +8,7 @@ WORKDIR /src
 COPY ui/wvtr-front .
 RUN npx pnpm build-only
 
-FROM debian:trixie
+FROM chainguard/wolfi-base:latest
 WORKDIR /app
 COPY --from=builder-server /src/wvtrserv .
 COPY --from=builder-web /src/dist ui/wvtr-front/dist
