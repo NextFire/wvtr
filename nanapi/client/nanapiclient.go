@@ -25,6 +25,7 @@ func createClient() *NanaClient {
 		Header: []string{
 			"Authorization", "Basic " + b64,
 			"Accept", "*/*",
+			"Content-Type", "application/json",
 		},
 	}
 
@@ -45,13 +46,76 @@ func getAscendedWaifusFromDicordID(discordID string) *http.Response {
 
 	reqPath := client.Config.NanapiDomain + "/prod/waicolle/waifus?" + params.Encode()
 	logger.DumpLog.Println(reqPath)
-	response := utils.Fetch(reqPath, methode, url.Values{}, client.Header)
+	response := utils.Fetch(reqPath, methode, url.Values{}.Encode(), client.Header)
 
 	if response == nil {
 		return nil
 	}
 
 	return response
+}
+
+func fetchAnilistChar(wlist []*Waifu) []*JoinWC {
+	doWlist := wlist
+
+	methode := "POST"
+	logger.DumpLog.Println(doWlist)
+
+	type IdsForWaifus struct {
+		Ids []int `json:"ids_al"`
+	}
+	reqIds := IdsForWaifus{
+		Ids: make([]int, len(wlist)),
+	}
+
+	for i, w := range doWlist {
+		reqIds.Ids[i] = w.Charachter.IdAl
+	}
+
+	toSend, err1 := json.Marshal(reqIds)
+	if err1 != nil {
+		logger.ErrLog.Println("Can't marshal al char ids: ", err1)
+		return nil
+	}
+
+	reqPath := client.Config.NanapiDomain + "/prod/anilist/charas/search"
+
+	logger.DumpLog.Println("Request anilist characters to ", reqPath)
+	var toSendStr string = string(toSend)
+	logger.DumpLog.Println(toSendStr)
+	response := utils.Fetch(reqPath, methode, toSendStr, client.Header)
+	logger.DumpLog.Println("Received anilist characters response")
+
+	var waifusAL []*CharachterAL = make([]*CharachterAL, 0)
+	err := json.NewDecoder(response.Body).Decode(&waifusAL)
+
+	if err != nil {
+		logger.ErrLog.Println("Can't unmarshal waifus : ", err)
+		a := ""
+		json.NewDecoder(response.Body).Decode(&a)
+		logger.ErrLog.Println("Can't unmarshal waifus : ", response.Body)
+
+		return nil
+	}
+	var mapCharAL map[int]*CharachterAL = make(map[int]*CharachterAL, 0)
+	for _, cal := range waifusAL {
+		mapCharAL[cal.IdAl] = cal
+	}
+
+	//logger.DumpLog.Println("Decoded : ", str)
+	var res []*JoinWC = make([]*JoinWC, len(doWlist))
+
+	for i, w := range doWlist {
+		res[i] = &JoinWC{
+			ID:                doWlist[i].ID,
+			IdAl:              mapCharAL[w.Charachter.IdAl].IdAl,
+			NameUserPreferred: mapCharAL[w.Charachter.IdAl].NameUserPreferred,
+			ImageLarge:        mapCharAL[w.Charachter.IdAl].ImageLarge,
+			Rank:              mapCharAL[w.Charachter.IdAl].Rank,
+		}
+	}
+
+	return res
 }
 
 func fetchAnilistCharBulk(wlist []*Waifu, bulksize int) ([]*Waifu, []*JoinWC) {
@@ -75,7 +139,7 @@ func fetchAnilistCharBulk(wlist []*Waifu, bulksize int) ([]*Waifu, []*JoinWC) {
 	reqPath := client.Config.NanapiDomain + "/prod/anilist/charas?" + params.Encode()
 
 	logger.DumpLog.Println("Request anilist charachters to ", reqPath)
-	response := utils.Fetch(reqPath, methode, url.Values{}, client.Header)
+	response := utils.Fetch(reqPath, methode, url.Values{}.Encode(), client.Header)
 	logger.DumpLog.Println("Received anilist charachters response")
 
 	var waifus []*CharachterAL = make([]*CharachterAL, 0)
@@ -107,6 +171,10 @@ func fetchAnilistCharBulk(wlist []*Waifu, bulksize int) ([]*Waifu, []*JoinWC) {
 }
 
 func getAnilistChar(wlist []*Waifu) []*JoinWC {
+	return fetchAnilistChar(wlist)
+}
+
+func getAnilistCharBulk(wlist []*Waifu) []*JoinWC {
 	rest := wlist
 	var res []*JoinWC
 	bulkSize := 20

@@ -52,7 +52,7 @@ type UserToken struct {
 var authEndPoints *AuthEndpoints = &AuthEndpoints{}
 
 func fetchAuthEndpoints() {
-	resp := utils.Fetch(config.GetNanapiConfig().OIDCURL+"/.well-known/openid-configuration", "GET", url.Values{}, []string{"Content-Type", "application/json"})
+	resp := utils.Fetch(config.GetNanapiConfig().OIDCURL+"/.well-known/openid-configuration", "GET", "", []string{"Content-Type", "application/json"})
 	if resp == nil {
 		return
 	}
@@ -113,7 +113,7 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 
 	header := []string{"Content-Type", "application/x-www-form-urlencoded"}
 	logger.DumpLog.Println(params.Encode())
-	tokenResp := utils.Fetch(tokenEndpoint, methode, params, header)
+	tokenResp := utils.Fetch(tokenEndpoint, methode, params.Encode(), header)
 
 	uToken := &UserToken{}
 	err := json.NewDecoder(tokenResp.Body).Decode(uToken)
@@ -125,7 +125,7 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	// Read and print response
 	//utils.ReadResponse(tokenResp)
 
-	userResp := utils.Fetch(authEndPoints.UserInfoEndPoint, "", url.Values{}, []string{"Authorization", "Bearer " + uToken.AccessToken})
+	userResp := utils.Fetch(authEndPoints.UserInfoEndPoint, "", "", []string{"Authorization", "Bearer " + uToken.AccessToken})
 	//readResponse(userResp)
 
 	discordAccount := &DiscordAccount{}

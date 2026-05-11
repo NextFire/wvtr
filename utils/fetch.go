@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 	"wvtrserv/logger"
@@ -22,13 +21,13 @@ func ReadResponse(response *http.Response) []byte {
 	return resp
 }
 
-func Fetch(reqURL string, method string, params url.Values, header []string) *http.Response {
+func Fetch(reqURL string, method string, paramsJSON string, header []string) *http.Response {
 	// Create a new HTTP client
 	client := &http.Client{
 		Timeout: time.Second * 60, // Timeout each requests
 	}
 
-	req := CreateRequest(reqURL, method, params, header)
+	req := CreateRequest(reqURL, method, paramsJSON, header)
 
 	//Execute the request using the custom HTTP client
 	response, err := client.Do(req)
@@ -40,14 +39,14 @@ func Fetch(reqURL string, method string, params url.Values, header []string) *ht
 	return response
 }
 
-func CreateRequest(reqURL string, method string, params url.Values, header []string) *http.Request {
+func CreateRequest(reqURL string, method string, paramsJSON string, header []string) *http.Request {
 
 	// logger.DumpLog.Println(reqURL)
 	// logger.DumpLog.Println(header)
 	// logger.DumpLog.Println(method)
 	// logger.DumpLog.Println(params.Encode())
 
-	req, err := http.NewRequest(method, reqURL, strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(method, reqURL, strings.NewReader(paramsJSON))
 
 	//logger.DumpLog.Println("request body : ", req.Body)
 
