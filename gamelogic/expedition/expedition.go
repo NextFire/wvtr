@@ -30,20 +30,19 @@ func (e *Expedition) CanEnter(user *data.User) bool {
 	return false
 }
 
-func (e *Expedition) Solve(identifier string, pTeam *data.Team) *data.ExpeditionDB {
+func (e *Expedition) Solve(identifier string, pTeam *data.Team, co []*data.CurrencyOwned) *data.ExpeditionDB {
 	var t time.Time = time.Now()
 	happened := make([]*data.ExpeditionStepResolveInfo, 0)
 	for _, ev := range e.Events {
-		event := ev.CopyEvent()
-		happened = append(happened, event.Solve(t, pTeam))
-		t = t.Add(event.GetDuration())
+		happened = append(happened, ev.Solve(t, pTeam))
+		t = t.Add(ev.GetDuration())
 		if pTeam.IsDefeated() {
 			break
 		}
 	}
-	loot := data.NewInventory(make([]*data.CurrencyOwned, data.MaxCType))
+	loot := data.NewInventory(co)
 	re := e.GetReward()
-	loot.StoreReward(re.Loot)
+	loot.StoreReward(re.Loot, re.Currencies)
 	edb := &data.ExpeditionDB{
 		Identifier:   identifier,
 		StartedAt:    t.UTC(),
@@ -69,5 +68,21 @@ func (e Expedition) GetReward() *Reward {
 	for _, ev := range e.Events {
 		res.MergeReward(ev.GetReward())
 	}
+	return res
+}
+
+func (e Expedition) GetCopy() Expedition {
+	res := Expedition{
+		StartedAt:  e.StartedAt,
+		ImgURL:     e.ImgURL,
+		HTeam:      e.HTeam,
+		Cost:       e.Cost,
+		CostNumber: e.CostNumber,
+		Events:     make([]ExpeditionEvent, len(e.Events)),
+	}
+	for i, ev := range e.Events {
+		res.Events[i] = ev.CopyEvent()
+	}
+
 	return res
 }

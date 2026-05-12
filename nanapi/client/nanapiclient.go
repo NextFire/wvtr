@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"wvtrserv/data"
 	"wvtrserv/logger"
 	"wvtrserv/nanapi/config"
 	"wvtrserv/utils"
@@ -55,11 +56,10 @@ func getAscendedWaifusFromDicordID(discordID string) *http.Response {
 	return response
 }
 
-func fetchAnilistChar(wlist []*Waifu) []*JoinWC {
+func fetchAnilistChar(wlist []*Waifu, user *data.User) []*JoinWC {
 	doWlist := wlist
 
 	methode := "POST"
-	logger.DumpLog.Println(doWlist)
 
 	type IdsForWaifus struct {
 		Ids []int `json:"ids_al"`
@@ -82,7 +82,6 @@ func fetchAnilistChar(wlist []*Waifu) []*JoinWC {
 
 	logger.DumpLog.Println("Request anilist characters to ", reqPath)
 	var toSendStr string = string(toSend)
-	logger.DumpLog.Println(toSendStr)
 	response := utils.Fetch(reqPath, methode, toSendStr, client.Header)
 	logger.DumpLog.Println("Received anilist characters response")
 
@@ -93,7 +92,6 @@ func fetchAnilistChar(wlist []*Waifu) []*JoinWC {
 		logger.ErrLog.Println("Can't unmarshal waifus : ", err)
 		a := ""
 		json.NewDecoder(response.Body).Decode(&a)
-		logger.ErrLog.Println("Can't unmarshal waifus : ", response.Body)
 
 		return nil
 	}
@@ -102,16 +100,17 @@ func fetchAnilistChar(wlist []*Waifu) []*JoinWC {
 		mapCharAL[cal.IdAl] = cal
 	}
 
-	//logger.DumpLog.Println("Decoded : ", str)
-	var res []*JoinWC = make([]*JoinWC, len(doWlist))
+	var res []*JoinWC = make([]*JoinWC, 0)
 
 	for i, w := range doWlist {
-		res[i] = &JoinWC{
-			ID:                doWlist[i].ID,
-			IdAl:              mapCharAL[w.Charachter.IdAl].IdAl,
-			NameUserPreferred: mapCharAL[w.Charachter.IdAl].NameUserPreferred,
-			ImageLarge:        mapCharAL[w.Charachter.IdAl].ImageLarge,
-			Rank:              mapCharAL[w.Charachter.IdAl].Rank,
+		if user.GetOwnedHeroByWaifuID(doWlist[i].ID) == nil {
+			res = append(res, &JoinWC{
+				ID:                doWlist[i].ID,
+				IdAl:              mapCharAL[w.Charachter.IdAl].IdAl,
+				NameUserPreferred: mapCharAL[w.Charachter.IdAl].NameUserPreferred,
+				ImageLarge:        mapCharAL[w.Charachter.IdAl].ImageLarge,
+				Rank:              mapCharAL[w.Charachter.IdAl].Rank,
+			})
 		}
 	}
 
@@ -170,8 +169,8 @@ func fetchAnilistCharBulk(wlist []*Waifu, bulksize int) ([]*Waifu, []*JoinWC) {
 	return rest, res
 }
 
-func getAnilistChar(wlist []*Waifu) []*JoinWC {
-	return fetchAnilistChar(wlist)
+func getAnilistChar(wlist []*Waifu, user *data.User) []*JoinWC {
+	return fetchAnilistChar(wlist, user)
 }
 
 func getAnilistCharBulk(wlist []*Waifu) []*JoinWC {
@@ -187,8 +186,8 @@ func getAnilistCharBulk(wlist []*Waifu) []*JoinWC {
 	return res
 }
 
-func GetAvailableWaifuToSendToWVTR(discordID string) []*JoinWC {
-	responseWaifu := getAscendedWaifusFromDicordID(discordID)
+func GetAvailableWaifuToSendToWVTR(user *data.User) []*JoinWC {
+	responseWaifu := getAscendedWaifusFromDicordID(user.DiscordID)
 	if responseWaifu == nil {
 		return nil
 	}
@@ -202,5 +201,5 @@ func GetAvailableWaifuToSendToWVTR(discordID string) []*JoinWC {
 
 	logger.DumpLog.Println("Received ascended waifus :", len(waifus))
 
-	return getAnilistChar(waifus)
+	return getAnilistChar(waifus, user)
 }

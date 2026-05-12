@@ -15,3 +15,12 @@ func (u *User) GetReward(expReward *Reward) {
 	}
 	u.Inventory.Merge(expReward.Loot)
 }
+
+func (u *User) GetOwnedHeroByWaifuID(id string) *Hero {
+	for _, oh := range u.OwnedHeroes {
+		if *oh.WaifuID == id {
+			return oh
+		}
+	}
+	return nil
+}

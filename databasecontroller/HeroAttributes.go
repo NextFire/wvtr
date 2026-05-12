@@ -8,7 +8,6 @@ func SaveHeroAttributes(a *data.HeroAttributes) {
 
 func GetHeroAttributesByID(id uint) *data.HeroAttributes {
 	var inv *data.HeroAttributes = &data.HeroAttributes{}
-	// We can request equipment id later
 	db.Find(&inv, id)
 
 	return inv

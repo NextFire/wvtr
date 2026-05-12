@@ -4,7 +4,6 @@ import "wvtrserv/data"
 
 func GetArmorByID(id uint) *data.Armor {
 	var armor *data.Armor = &data.Armor{}
-	// Weapon Without States make no sens
 	db.Preload("BlockScore").
 		Preload("EvadeScore").
 		Preload("BaseResistancesRange").
@@ -15,4 +14,8 @@ func GetArmorByID(id uint) *data.Armor {
 		armor.Affixes[i] = GetAffixByID(armor.Affixes[i].ID)
 	}
 	return armor
+}
+
+func SaveArmor(o *data.Armor) {
+	db.Save(o)
 }

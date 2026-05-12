@@ -12,9 +12,9 @@ type RewardPool struct {
 type Reward struct {
 	XP         float64
 	Pool       *RewardPool
-	LootChance float64
-	Loot       []data.IStorable
-	Currencies map[data.CurrencyType]int
+	LootChance float64                   /* Chance to roll one loot from the pool */
+	Loot       []data.IStorable          /* Loot that have droped */
+	Currencies map[data.CurrencyType]int /* [Currenty type] quantity */
 }
 
 func NewReward(rewardPool *RewardPool) *Reward {
@@ -22,7 +22,7 @@ func NewReward(rewardPool *RewardPool) *Reward {
 		XP:         0,
 		Loot:       make([]data.IStorable, 0),
 		Pool:       rewardPool,
-		Currencies: make(map[data.CurrencyType]int),
+		Currencies: make(map[data.CurrencyType]int, 0),
 	}
 
 	return res
@@ -34,6 +34,7 @@ func (r *Reward) MergeReward(toAdd *Reward) {
 		r.AddStorable(s)
 	}
 	for k, v := range toAdd.Currencies {
+
 		r.Currencies[k] += v
 	}
 }
@@ -66,8 +67,17 @@ func (r *Reward) GenRandomReward() {
 
 	if len(r.Pool.CurrencyPool) > 0 {
 		for k, v := range r.Pool.CurrencyPool {
-			data.NaturalRoll(v.Min, v.Max)
-			r.Currencies[k] = int(v.Value)
+			r.Currencies[k] = int(data.NaturalRoll(v.Min, v.Max))
 		}
+	}
+}
+
+func (r *Reward) GetCopy() *Reward {
+	return &Reward{
+		XP:         0,
+		Pool:       r.Pool,
+		LootChance: r.LootChance,
+		Loot:       make([]data.IStorable, 0),
+		Currencies: make(map[data.CurrencyType]int, 0),
 	}
 }

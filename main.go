@@ -1,14 +1,10 @@
 package main
 
-//TODO: Make DB controller better stp
-
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 	"wvtrserv/data"
@@ -20,22 +16,6 @@ import (
 	"wvtrserv/nanapi/config"
 	"wvtrserv/utils"
 )
-
-// Main page ?
-// func handler(w http.ResponseWriter, r *http.Request) {
-// 	logger.DumpLog.Printf("req.Method: %s\n", r.Method)
-// 	logger.DumpLog.Printf("req.URL.Path: %s\n", r.URL.Path)
-// 	logger.DumpLog.Printf("req.ContentLength: %d\n", r.ContentLength)
-
-// 	d := http.Dir("./ui/vu/UI/dist")
-// 	f, err := d.Open("index.html")
-// 	if err != nil {
-// 		logger.ErrLog.Println(err)
-// 	}
-
-// 	defer f.Close()
-// 	io.Copy(w, f)
-// }
 
 type AuthEndpoints struct {
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
@@ -56,18 +36,9 @@ func fetchAuthEndpoints() {
 	if resp == nil {
 		return
 	}
-	//defer resp.Body.Close()
 
-	err := json.NewDecoder(resp.Body).Decode(authEndPoints)
-	if err != nil {
-		logger.ErrLog.Printf("Problem while trying to get the authentificator endoints\n")
-	}
+	authEndPoints = utils.DecodeJson(authEndPoints, resp.Body)
 }
-
-// Main page
-// func handleMainPage(w http.ResponseWriter, r *http.Request) {
-
-// }
 
 type DiscordAccount struct {
 	Name      string `json:"name"`
@@ -78,7 +49,6 @@ func handlerAuth(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerAuth]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
 
-	// Example usage
 	tokenEndpoint := authEndPoints.AuthorizationEndpoint
 	logger.DumpLog.Println(tokenEndpoint)
 	params := url.Values{}
@@ -94,13 +64,11 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerConnexion]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
 
-	// logger.DumpLog.Print(r)
 	code := r.URL.Query().Get("code")
 	logger.DumpLog.Println(code)
 	clientId := config.GetNanapiConfig().OIDCCLientId
 	clientSecret := config.GetNanapiConfig().OIDCCLientSecret
 
-	// Example usage
 	tokenEndpoint := authEndPoints.TokenEndPoint
 	logger.DumpLog.Println(tokenEndpoint)
 	methode := "POST"
@@ -116,22 +84,18 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 	tokenResp := utils.Fetch(tokenEndpoint, methode, params.Encode(), header)
 
 	uToken := &UserToken{}
-	err := json.NewDecoder(tokenResp.Body).Decode(uToken)
-	if err != nil {
-		logger.ErrLog.Println(err)
+
+	uToken = utils.DecodeJson(uToken, tokenResp.Body)
+	if uToken == nil {
 		return
 	}
 
-	// Read and print response
-	//utils.ReadResponse(tokenResp)
-
 	userResp := utils.Fetch(authEndPoints.UserInfoEndPoint, "", "", []string{"Authorization", "Bearer " + uToken.AccessToken})
-	//readResponse(userResp)
 
 	discordAccount := &DiscordAccount{}
-	decodError := json.NewDecoder(userResp.Body).Decode(discordAccount)
-	if decodError != nil {
-		logger.ErrLog.Println(decodError)
+
+	discordAccount = utils.DecodeJson(discordAccount, userResp.Body)
+	if discordAccount == nil {
 		return
 	}
 
@@ -175,39 +139,30 @@ func handlerConnexion(w http.ResponseWriter, r *http.Request) {
 func handleGetPlayerWaicolleAscendedWaifus(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handleGetPlayerWaicolleAscendedWaifus]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
 
 	user := databasecontroller.GetUserByID(uint(id))
+
 	toSend := "{}"
 
-	waifus := client.GetAvailableWaifuToSendToWVTR(user.DiscordID)
+	waifus := client.GetAvailableWaifuToSendToWVTR(user)
 	if waifus == nil {
 		logger.ErrLog.Printf("%s can't get response from nanpi with user [%d]", functionS, user.ID)
 		fmt.Fprintf(w, "%s", toSend)
 		return
 	}
 
-	strsend, err := json.Marshal(waifus)
-	toSend = string(strsend)
-	if err != nil {
-		logger.ErrLog.Println("Can't decode waifu response")
-		fmt.Fprintf(w, "%s", toSend)
-	}
-	logger.DumpLog.Println("Giving :", len(waifus), " waifus.")
-	fmt.Fprintf(w, "%s", toSend)
+	utils.Give(waifus, w, false)
 }
 
 func handlerCreateHeroForPlayer(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handleGetPlayerWaicolleAscendedWaifus]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
-	//user := databasecontroller.GetUserByID(uint(id))
+	id := utils.GetParamInt("id", r)
+
 	waifu := &client.JoinWC{}
-	err := json.NewDecoder(r.Body).Decode(waifu)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	waifu = utils.DecodeJson(waifu, r.Body)
+	if waifu == nil {
 		return
 	}
 
@@ -222,104 +177,65 @@ func handlerCreateHeroForPlayer(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s is already a hero", waifu.NameUserPreferred)
 		return
 	}
-	stosend, err := json.Marshal(newH)
 
-	if err != nil {
-		logger.ErrLog.Println("Can't marshal new hero")
-		return
-	}
-
-	fmt.Fprintf(w, "%s", stosend)
+	utils.Give(newH, w, true)
 }
 
 // Getters
 func handlerHero(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerHero]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
 
 	hero := databasecontroller.GetHeroByID(uint(id))
 
-	b, err := json.Marshal(hero)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(hero, w, true)
 }
 
 func handlerTeam(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerTeam]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
 
 	team := databasecontroller.GetTeamByID(uint(id))
 
-	b, err := json.Marshal(team)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(team, w, true)
 }
 
-func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
-	functionS := "[handlerExpeditionReport]"
+func handlerInventory(w http.ResponseWriter, r *http.Request) {
+	functionS := "[handlerInventory]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("uid")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
 
-	user := databasecontroller.GetUserByID(uint(id))
-	exp := user.State.CurrentExpedition
-	user.GetReward(exp.ExpeditionRewards)
-	databasecontroller.UpdateUser(user)
+	inv := databasecontroller.GetInventoryByID(uint(id))
 
-	b, err := json.Marshal(user.State.CurrentExpedition)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(inv, w, true)
 }
 
 func handlerAvailableExpeditions(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerAvailableExpeditions]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
+
+	if id == 0 {
+		fmt.Fprintf(w, "{}")
+		return
+	}
 	user := databasecontroller.GetUserByID(uint(id))
 
 	expeditions := gamedata.GetAvailableExpeditions(user)
 
-	b, err := json.Marshal(expeditions)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(expeditions, w, true)
 }
 
 func handlerUser(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerUser]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("id")
-	id, _ := strconv.Atoi(ids)
+	id := utils.GetParamInt("id", r)
 
 	user := databasecontroller.GetUserByID(uint(id))
 
-	b, err := json.Marshal(user)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(user, w, true)
 }
 
 // Updaters
@@ -334,10 +250,8 @@ func handlerSaveUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &data.User{}
-	err := json.NewDecoder(r.Body).Decode(user)
-	if err != nil {
-		logger.ErrLog.Printf("%s Error when trying to get the user from the request body, got : %s", functionS, r.Body)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	user = utils.DecodeJson(user, r.Body)
+	if user == nil {
 		return
 	}
 
@@ -356,22 +270,16 @@ func handlerSaveGameState(w http.ResponseWriter, r *http.Request) {
 	}
 
 	state := &data.GameState{}
-	err := json.NewDecoder(r.Body).Decode(state)
-	if err != nil {
-		logger.ErrLog.Printf("%s Error when trying to get the user from the request body, got : %s", functionS, r.Body)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
+	state = utils.DecodeJson(state, r.Body)
+	if state == nil {
+		utils.Give("{}", w, true)
 		return
 	}
 
 	databasecontroller.UpdateGameState(state)
 
-	b, err := json.Marshal(state)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(state, w, true)
 }
 
 func handlerUpdateTeam(w http.ResponseWriter, r *http.Request) {
@@ -385,24 +293,17 @@ func handlerUpdateTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := &data.User{}
-	err := json.NewDecoder(r.Body).Decode(user)
-	if err != nil {
-		logger.ErrLog.Printf("%s Error when trying to get the user from the request body, got : %s", functionS, r.Body)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	user = utils.DecodeJson(user, r.Body)
+	if user == nil {
 		return
 	}
 
 	databasecontroller.UpdateTeam(user.CurrentTeam)
 	user = databasecontroller.GetUserByID(user.ID)
-	b, err := json.Marshal(user.CurrentTeam)
-	if err != nil {
-		logger.ErrLog.Println(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
+
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "%s", string(b))
+	utils.Give(user.CurrentTeam, w, true)
+
 }
 
 type CurrentStepRequestMessage struct {
@@ -420,60 +321,55 @@ func handlerCurrentExpeditionStep(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, s, http.StatusMethodNotAllowed)
 		return
 	}
-	var data CurrentStepRequestMessage
-	err := json.NewDecoder(r.Body).Decode(&data)
+	var data *CurrentStepRequestMessage = &CurrentStepRequestMessage{}
+	data = utils.DecodeJson(data, r.Body)
+	if data == nil {
+		return
+	}
+
 	var t time.Time = time.Unix(0, data.Time*int64(time.Millisecond))
 
 	user := databasecontroller.GetUserByID(uint(data.Uid))
-
-	if err != nil {
-		logger.ErrLog.Printf("%s Error when trying to get the time : %s", functionS, r.Body)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 	res := databasecontroller.UpdateGameStateWithTime(user.State, &t)
 	databasecontroller.UpdateTeamWithExpAndTime(user.CurrentTeam, *user.State.CurrentExpedition, t)
 	databasecontroller.UpdateGameState(user.State)
 
-	resS := "{}"
-	if res != nil {
-		b, err := json.Marshal(res)
-
-		if err != nil {
-			logger.ErrLog.Println(err)
-			return
-		}
-		resS = string(b)
-	}
-
-	logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, resS)
-	fmt.Fprintf(w, "%s", resS)
+	utils.Give(res, w, true)
 }
 
 func handlerLaunchExpedition(w http.ResponseWriter, r *http.Request) {
 	functionS := "[handlerLaunchExpedition]"
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
-	ids := r.PathValue("usr")
-	id, _ := strconv.Atoi(ids)
 
+	id := utils.GetParamInt("usr", r)
 	expIdentifier := r.PathValue("expId")
 
 	user := databasecontroller.GetUserByID(uint(id))
-	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier]
+	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier].GetCopy()
 	if exp.CanEnter(user) && user.Inventory.Remove(exp.Cost, exp.CostNumber) {
-		databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam))
-		//databasecontroller.SaveTeam(user.CurrentTeam)
-		b, err := json.Marshal(user.State.CurrentExpedition.WhatHappened[0])
-		if err != nil {
-			logger.ErrLog.Println(err)
-			return
-		}
-		logger.DumpLog.Printf("%s Giving :\n %s\n", functionS, string(b))
-		fmt.Fprintf(w, "%s", string(b))
+		databasecontroller.SaveInventory(user.Inventory)
+		c := data.NewCurrencyOwned(databasecontroller.GetAllCurrencies())
+		databasecontroller.LaunchExpedition(user, exp.Solve(expIdentifier, user.CurrentTeam, c))
+
+		utils.Give(user.State.CurrentExpedition.WhatHappened[0], w, true)
 		return
 	}
 
 	fmt.Fprintf(w, "Can't launch expedition")
+}
+
+func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
+	functionS := "[handlerExpeditionReport]"
+	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
+	id := utils.GetParamInt("uid", r)
+
+	user := databasecontroller.GetUserByID(uint(id))
+	exp := user.State.CurrentExpedition
+	user.GetReward(exp.ExpeditionRewards)
+	databasecontroller.UpdateUser(user)
+	databasecontroller.SaveTeam(user.CurrentTeam)
+	databasecontroller.SaveInventory(user.Inventory)
+	utils.Give(user.State.CurrentExpedition, w, true)
 }
 
 func main() {
@@ -483,7 +379,6 @@ func main() {
 	// Get main page
 	fs := http.FileServer(http.Dir("./ui/wvtr-front/dist"))
 	http.Handle("/", fs)
-	//http.HandleFunc("/", handleMainPage)
 
 	// Connexion
 	http.HandleFunc("/api/oidc/auth", handlerAuth)
@@ -493,6 +388,7 @@ func main() {
 	//get
 	http.HandleFunc("/hero/{id}", handlerHero)
 	http.HandleFunc("/teams/{id}", handlerTeam)
+	http.HandleFunc("/inventory/{id}", handlerInventory)
 	http.HandleFunc("/expeditionReport/{uid}", handlerExpeditionReport)
 	http.HandleFunc("/user/{id}", handlerUser)
 	http.HandleFunc("/availableexpeditions/{id}", handlerAvailableExpeditions)
@@ -516,13 +412,6 @@ func main() {
 
 	logger.DumpLog.Println("Listening on :4210...")
 	err := http.ListenAndServe(":4210", nil)
-
-	// testing std input
-	var i int
-
-	logger.DumpLog.Print("Type a number: ")
-	fmt.Scan(&i)
-	logger.DumpLog.Println("Your number is:", i)
 
 	if err != nil {
 		log.Fatal(err)

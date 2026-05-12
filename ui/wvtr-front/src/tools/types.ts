@@ -280,6 +280,7 @@ export type {
     Waifu,
     FieldActionDesc,
     ExpToGetFromBack,
+    Inventory,
 };
 
 export {

@@ -55,8 +55,12 @@ func createDB(db *gorm.DB) {
 
 	InsertSkillsInDB()
 	InsertHeroClassesInDB()
-	InsertEveryEnemiesInDB()
 	InsertAllCurrenciesInDB()
+	InsertEveryEnemiesInDB()
+}
+
+func Delete[T any](row T) {
+	db.Delete(row)
 }
 
 func LaunchExpedition(user *data.User, expedition *data.ExpeditionDB) {
@@ -64,10 +68,7 @@ func LaunchExpedition(user *data.User, expedition *data.ExpeditionDB) {
 	if user.UserIsHome() && !user.UserHasAProblem() {
 		user.State.CurrentExpedition = expedition
 		user.State.State = expedition.WhatHappened[0].StepState
-		// if user.State.State == data.Fight {
-		// 	glTeam := gamedata.GetEnemyTeamForEvent(expedition.Identifier, 0)
-		// 	user.State.ETeam = (*data.Team)(glTeam)
-		// }
+
 		UpdateGameState(user.State)
 	} else {
 		logger.ErrLog.Printf("requested to launch an expedition on user %s but user is [state: %s].", user.Name, user.State.State)

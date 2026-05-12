@@ -4,7 +4,6 @@ import "wvtrserv/data"
 
 func GetFieldActionDescByID(id uint) *data.FieldActionDesc {
 	var res *data.FieldActionDesc = &data.FieldActionDesc{}
-	// We can request equipment id later
 	db.Preload("FromH").
 		Preload("UsedSkill").
 		Preload("TargetH").

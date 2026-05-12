@@ -4,7 +4,6 @@ import "wvtrserv/data"
 
 func GetExpeditionStepResolveInfoByID(id uint) *data.ExpeditionStepResolveInfo {
 	var ex *data.ExpeditionStepResolveInfo = &data.ExpeditionStepResolveInfo{}
-	// We can request equipment id later
 	db.Preload("Timeline").
 		Preload("ETeam").
 		Find(&ex, id)

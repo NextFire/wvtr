@@ -17,7 +17,6 @@ func GetGameState(gameState *data.GameState) *data.GameState {
 
 func GetGameStateByID(id uint) *data.GameState {
 	var gs *data.GameState = &data.GameState{}
-	// We can request equipment id later
 	db.Preload("CurrentExpedition").
 		Find(&gs, id)
 

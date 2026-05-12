@@ -63,7 +63,7 @@ func (e FightEvent) CopyEvent() ExpeditionEvent {
 			duration:         e.duration,
 			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
 			Name:             e.Name,
-			Reward:           e.Reward,
+			Reward:           e.Reward.GetCopy(),
 		},
 		EnemyPool: e.EnemyPool,
 	}

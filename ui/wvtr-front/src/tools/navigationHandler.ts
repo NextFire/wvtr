@@ -1,5 +1,5 @@
 import { inject, ref, type Ref } from "vue"
-import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type ExpToGetFromBack, type GameState, type Hero, type Team, type User, type Waifu } from "./types"
+import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type ExpToGetFromBack, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
 import type { VueCookies } from "vue-cookies";
 import { buildRequestPath, fetchData, global, postRequest, RequestType } from "./utils";
 
@@ -105,6 +105,14 @@ class NavigationHandler {
         this.user.value!.currentTeam! = response.value!
     }
 
+    async fetchInventory() {
+        let response = ref<Inventory | undefined>(undefined)
+        await fetchData<Inventory>(response, RequestType.Inventory, [{ id: "id", value: `${this.user.value!.currentTeam.id}` }])
+
+        this.user.value!.inventory = response.value!
+        await this.fetchAvailableExpedition()
+    }
+
     async fetchExpeditionReport() {
         const report = ref<ExpeditionDB | undefined>(undefined)
         await fetchData<ExpeditionDB>(report, RequestType.ExpeditionReport, [{ id: "uid", value: `${this.user.value!.id}` }])
@@ -133,6 +141,7 @@ class NavigationHandler {
         request = request.replace(`{usr}`, String(this.user.value!.id))
         request = request.replace(`{expId}`, expId)
         const response = await fetch(request);
+        await this.fetchInventory()
         target.value = await response.json() as ExpeditionStepResolveInfo
         if (target.value) {
             this.user.value!.state.state = target.value.stepState

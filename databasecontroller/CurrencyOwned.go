@@ -4,7 +4,6 @@ import "wvtrserv/data"
 
 func GetCurrencyOwnedByID(id uint) *data.CurrencyOwned {
 	var res *data.CurrencyOwned = &data.CurrencyOwned{}
-	// We can request equipment id later
 	db.Preload("Currency").
 		Find(&res, id)
 
@@ -13,4 +12,8 @@ func GetCurrencyOwnedByID(id uint) *data.CurrencyOwned {
 	}
 
 	return res
+}
+
+func SaveCurrencyOwned(c *data.CurrencyOwned) {
+	db.Save(c)
 }

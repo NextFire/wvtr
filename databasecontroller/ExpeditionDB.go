@@ -11,7 +11,6 @@ func CreateExpeditionDB(edb *data.ExpeditionDB) {
 
 func GetExpeditionDBByID(id uint) *data.ExpeditionDB {
 	var ex *data.ExpeditionDB = &data.ExpeditionDB{}
-	// We can request equipment id later
 	db.Preload("WhatHappened").
 		Preload("ExpeditionRewards").
 		Find(&ex, id)
@@ -39,4 +38,12 @@ func GetCurrentExpeditionStepIdx(e data.ExpeditionDB, t *time.Time) int {
 		}
 	}
 	return len(e.WhatHappened)
+}
+
+func DeleteExpeditionDB(exp *data.ExpeditionDB) {
+	for _, eri := range exp.WhatHappened {
+		db.Delete(eri)
+	}
+	db.Delete(exp.ExpeditionRewards)
+	db.Delete(exp)
 }

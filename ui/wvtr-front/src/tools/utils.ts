@@ -9,6 +9,7 @@ class global {
     //Request object by id
     public static readonly REQ_HERO = "/hero/{id}";
     public static readonly REQ_TEAM = "/teams/{id}";
+    public static readonly REQ_INVENTORY = "/inventory/{id}";
     public static readonly REQ_EXPEDITIONREPORT = "/expeditionReport/{uid}";
     public static readonly REQ_USR = "/user/{id}";
     public static readonly REQ_AVAILABLEEXPEDITIONS = "/availableexpeditions/{id}"
@@ -37,6 +38,7 @@ enum RequestType {
     Team,
     ExpeditionReport,
     User,
+    Inventory,
     AvailableExpeditions,
     CurrentExpeditionStep,
     UserWaifus,
@@ -57,6 +59,9 @@ function buildRequestPath(reqType: RequestType, pathParams: { id: string; value:
             break
         case RequestType.Team:
             request += global.REQ_TEAM
+            break
+        case RequestType.Inventory:
+            request += global.REQ_INVENTORY
             break
         case RequestType.ExpeditionReport:
             request += global.REQ_EXPEDITIONREPORT

@@ -14,10 +14,10 @@ var Expeditions = map[string]expedition.Expedition{
 			testsmallRest1,
 		},
 	},
-	"Travel 40 sec": {
+	"Traveling 10 sec": {
 		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
 		Events: []expedition.ExpeditionEvent{
-			traval40s,
+			traval10s,
 		},
 	},
 	"Rest": {
@@ -38,6 +38,12 @@ var Expeditions = map[string]expedition.Expedition{
 		ImgURL: DOMAIN_NAME + "/imgs/expeditions/self_training.png",
 		Events: []expedition.ExpeditionEvent{
 			selfTraining,
+		},
+	},
+	"Work 10 sec": {
+		ImgURL: DOMAIN_NAME + "/imgs/expeditions/base_expedition.png",
+		Events: []expedition.ExpeditionEvent{
+			workShort,
 		},
 	},
 }

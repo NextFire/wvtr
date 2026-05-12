@@ -160,8 +160,11 @@ func (inv *Inventory) Merge(other *Inventory) {
 	}
 }
 
-func (i *Inventory) StoreReward(re []IStorable) {
+func (i *Inventory) StoreReward(re []IStorable, cu map[CurrencyType]int) {
 	for _, s := range re {
 		s.Store(i, 1)
+	}
+	for k, v := range cu {
+		i.Currencies[k].NumberOwned += v
 	}
 }

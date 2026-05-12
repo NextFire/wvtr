@@ -4,7 +4,6 @@ import "wvtrserv/data"
 
 func GetInventoryByID(id uint) *data.Inventory {
 	var res *data.Inventory = &data.Inventory{}
-	// We can request equipment id later
 	db.Preload("Weapons").
 		Preload("Armors").
 		Preload("Omamoris").
@@ -28,4 +27,19 @@ func GetInventoryByID(id uint) *data.Inventory {
 	}
 
 	return res
+}
+
+func SaveInventory(inv *data.Inventory) {
+	for _, w := range inv.Weapons {
+		SaveWeapon(w)
+	}
+	for _, a := range inv.Armors {
+		SaveArmor(a)
+	}
+	for _, o := range inv.Omamoris {
+		SaveOmamori(o)
+	}
+	for _, c := range inv.Currencies {
+		SaveCurrencyOwned(c)
+	}
 }

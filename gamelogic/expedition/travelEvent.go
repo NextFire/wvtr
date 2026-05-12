@@ -28,7 +28,7 @@ func (e TravelEvent) Solve(startAt time.Time, t *data.Team) *data.ExpeditionStep
 
 	resExp.AddNewHappening(startAt, "Traveling Start", nil)
 	resExp.AddNewHappening(startAt.Add(e.duration), "Traveling End", nil)
-
+	e.Reward.GenRandomReward()
 	return resExp
 }
 
@@ -38,7 +38,7 @@ func (e TravelEvent) CopyEvent() ExpeditionEvent {
 			duration:         e.duration,
 			EventSolvingInfo: &data.ExpeditionStepResolveInfo{},
 			Name:             e.Name,
-			Reward:           e.Reward,
+			Reward:           e.Reward.GetCopy(),
 		},
 	}
 }

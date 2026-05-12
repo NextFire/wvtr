@@ -16,7 +16,6 @@ func GetAllCurrencies() []*data.Currency {
 
 func GetCurrencyByID(id uint) *data.Currency {
 	var res *data.Currency = &data.Currency{}
-	// We can request equipment id later
 	db.Find(&res, id)
 
 	return res

@@ -11,6 +11,7 @@ import { inject, ref } from 'vue';
     async function onclick() {
         await navigationHandler.setGameState(EncounterState.Home)
         await navigationHandler.fetchTeam()
+        await navigationHandler.fetchInventory()
     }
 </script>
 

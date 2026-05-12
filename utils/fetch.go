@@ -1,13 +1,43 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 	"wvtrserv/logger"
 )
+
+func Give[T any](obj T, w http.ResponseWriter, log bool) {
+	strsend, err := json.Marshal(obj)
+	toSend := string(strsend)
+	if err != nil {
+		logger.ErrLog.Println("Problem, can't decode object: ", err)
+		fmt.Fprintf(w, "%s", "{}")
+	}
+	if log {
+		logger.DumpLog.Println("Give : ", toSend)
+	}
+	fmt.Fprintf(w, "%s", toSend)
+}
+
+func GetParamInt(paramName string, r *http.Request) int {
+	s := r.PathValue(paramName)
+	res, _ := strconv.Atoi(s)
+	return res
+}
+
+func DecodeJson[T any](obj *T, reader io.Reader) *T {
+	err := json.NewDecoder(reader).Decode(obj)
+	if err != nil {
+		logger.ErrLog.Println("Problem while trying to decode: ", err)
+		return nil
+	}
+	return obj
+}
 
 func ReadResponse(response *http.Response) []byte {
 	// Read and print response
