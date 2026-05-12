@@ -1,34 +1,29 @@
 <script setup lang="ts">
-    import { ref, onMounted, inject } from 'vue'
-    import Header from "./components/Header.vue"
-    import Body from "./components/Body.vue"
+    import { inject, onMounted } from 'vue'
+    import Header from './components/Header.vue'
+    import Body from './components/Body.vue'
     import { NavigationHandler, NavigationStatus } from './tools/navigationHandler.ts'
-    import type { User } from "./tools/types.ts"
     import type { VueCookies } from 'vue-cookies'
 
-    let $cookies = inject<VueCookies>('$cookies');
-    
-
-    //const user = ref<User|undefined>(undefined)
+    const $cookies = inject<VueCookies>('$cookies')
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
-    let user = navigationHandler.getUser()
+    const navigationStatus = navigationHandler.getNavigationStatus()
+
     onMounted(async () => {
-        user = await navigationHandler.setup($cookies!)
+        await navigationHandler.setup($cookies!)
     })
-
-
-
 </script>
 
 <template>
-<div v-if="navigationHandler.getNavigationStatus().value == NavigationStatus.Connexion" class="page">
-    <!-- <a v-if="authUrl" :href="authUrl">Login with OIDC</a> -->
-    <p>loading auth...</p>
-    <!-- <p v-else>loading auth...</p> -->
-</div>
-<div v-else class="page">
-    <Header/>
-    <Body/>
-</div>
+    <div v-if="navigationStatus == NavigationStatus.Connexion" class="page page-shell loading-screen">
+        <section class="panel panel-feature loading-card">
+            <p class="eyebrow">Synchronizing save crystal</p>
+            <h1>Waiventure</h1>
+            <p>Loading your guild, currencies, and latest expedition state.</p>
+        </section>
+    </div>
+    <div v-else class="page page-shell">
+        <Header/>
+        <Body/>
+    </div>
 </template>
-

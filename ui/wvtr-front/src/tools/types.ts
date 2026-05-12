@@ -156,7 +156,7 @@ type HeroAttributes = {
 
 type HeroClass = {
     name: string
-    descritpion: string
+    description: string
     class_icon_url: string
 }
 
@@ -287,4 +287,3 @@ export {
     EncounterState,
     HeroTakeDamageStatus,
 }
-

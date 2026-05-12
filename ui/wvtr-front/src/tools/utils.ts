@@ -191,6 +191,10 @@ function formatTextTimeFromTimeMS(timeMS: number) {
     return res
 }
 
+function clampToRange(value: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, value))
+}
+
 function getStringFromFAD(fad: FieldActionDesc): string[] {
     let res = new Array<string>();
     let from = fad.fromH
@@ -252,6 +256,7 @@ export {
     getCurrentExpeditionStepResolveInfo,
     getEncounterStateString,
     formatTextTimeFromTimeMS,
+    clampToRange,
     createAHeroFromAWaifu,
     getStringFromFAD,
     buildRequestPath,

@@ -1,43 +1,44 @@
 <script setup lang="ts">
-    import { ref, watch } from 'vue'
-    import type { Hero, Waifu } from "../tools/types.ts"
-    import { global } from "../tools/utils.ts"
+    import type { Waifu } from '../tools/types.ts'
 
     const props = defineProps<{
         waifu: Waifu;
-    }>();
+    }>()
 
-    let rankTextClass = "waifu-rank-e"
+    let rankTextClass = 'waifu-rank-e'
 
     switch (props.waifu.rank) {
-        case "S":
-            rankTextClass = "waifu-rank-s"
+        case 'S':
+            rankTextClass = 'waifu-rank-s'
             break
-        case "A":
-            rankTextClass = "waifu-rank-a"
+        case 'A':
+            rankTextClass = 'waifu-rank-a'
             break
-        case "B":
-            rankTextClass = "waifu-rank-b"
+        case 'B':
+            rankTextClass = 'waifu-rank-b'
             break
-        case "C":
-            rankTextClass = "waifu-rank-c"
+        case 'C':
+            rankTextClass = 'waifu-rank-c'
             break
-        case "D":
-            rankTextClass = "waifu-rank-d"
+        case 'D':
+            rankTextClass = 'waifu-rank-d'
             break
-        case "E":
-            rankTextClass = "waifu-rank-e"
+        case 'E':
+            rankTextClass = 'waifu-rank-e'
             break
     }
-    
 </script>
 
 <template>
-    <div class="column">
-        <div>{{ props.waifu.name_user_preferred }}</div>
-        <div class="waifu-image-container">
-            <img :src="props.waifu.image_large" width="125"/>
+    <article class="waifu-card">
+        <div class="waifu-card-header">
+            <p class="eyebrow">Rank {{ props.waifu.rank }}</p>
+            <h3>{{ props.waifu.name_user_preferred }}</h3>
+        </div>
+
+        <div class="waifu-image-container waifu-art">
+            <img :src="props.waifu.image_large" :alt="props.waifu.name_user_preferred"/>
             <div :class="rankTextClass">{{ props.waifu.rank }}</div>
         </div>
-    </div>
+    </article>
 </template>

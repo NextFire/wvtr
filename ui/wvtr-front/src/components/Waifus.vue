@@ -1,75 +1,65 @@
 <script setup lang="ts">
-    import { inject, onMounted, ref, watch } from "vue"
-    import type { User, Waifu } from "../tools/types.ts"
-    import type { Hero } from "../tools/types.ts"
-    import { global, fetchData, RequestType, createAHeroFromAWaifu } from "../tools/utils.ts"
-    import WaifuComp from "./WaifuComp.vue"
-    import { NavigationStatus, NavigationHandler } from "../tools/navigationHandler.ts"
+    import { inject, ref } from 'vue'
+    import type { Waifu } from '../tools/types.ts'
+    import WaifuComp from './WaifuComp.vue'
+    import { NavigationHandler } from '@/tools/navigationHandler.ts'
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     const userWaifus = navigationHandler.getUserWaifus()
-
-    let selectedWaifu = ref<Waifu|undefined>(undefined) 
-    let selectionB = ref<Record<string,string>>({})
-
-    onMounted(()=>{
-        if (userWaifus.value) {
-            fillSelectionB(userWaifus.value)
-        }
-    })
-    function fillSelectionB(waifus: Waifu[]) {
-        for (let i = 0; i < waifus.length; i++) {
-            if (waifus[i] ==  selectedWaifu.value) {
-                selectionB.value[waifus[i]!.id] = "eselected"
-            } else {
-                selectionB.value[waifus[i]!.id] = "enotselected"
-            }
-        }
-    }
+    const selectedWaifu = ref<Waifu | undefined>(undefined)
+    const isCreating = ref(false)
 
     function clickOnWaifu(waifu: Waifu) {
-        if (userWaifus.value) {
-            if (selectedWaifu.value != waifu) {
-                selectedWaifu.value = waifu
-                fillSelectionB(userWaifus.value!)
-            } else {
-                selectedWaifu.value = undefined
-                fillSelectionB(userWaifus.value!)
-            }
-        }
+        selectedWaifu.value = selectedWaifu.value == waifu ? undefined : waifu
     }
 
     async function onclick() {
-        if (selectedWaifu.value) {
-            navigationHandler.createAHeroFromAWaifu(selectedWaifu.value)
+        if (!selectedWaifu.value || isCreating.value) {
+            return
+        }
+
+        isCreating.value = true
+
+        try {
+            await navigationHandler.createAHeroFromAWaifu(selectedWaifu.value)
+            selectedWaifu.value = undefined
+        } finally {
+            isCreating.value = false
         }
     }
-
-    watch(userWaifus, (nuw)=>{
-        if (nuw) {
-            fillSelectionB(nuw)
-        }
-    })
-
 </script>
 
 <template>
-    <div v-if="userWaifus">
-        <h1>Select a Waifu</h1>
-        <div style="display: flex; align-items: center; justify-content: center;">
+    <section v-if="userWaifus" class="selection-panel">
+        <div class="panel-heading">
             <div>
-                <button v-on:click="onclick()">Make a hero</button>
+                <p class="eyebrow">Summoning room</p>
+                <h2>Select a waifu</h2>
+                <p>Choose the next recruit you want to elevate into your hero roster.</p>
+            </div>
+
+            <div class="selection-toolbar">
+                <div class="stat-pill">
+                    <span>Chosen</span>
+                    <strong>{{ selectedWaifu?.name_user_preferred ?? 'None' }}</strong>
+                </div>
+                <button class="primary-button" v-on:click="onclick()" :disabled="!selectedWaifu || isCreating">{{ isCreating ? 'Forging hero...' : 'Make a hero' }}</button>
             </div>
         </div>
-        <div class="column">
-            <div class="row" style="display: flex;flex-wrap: wrap;"> 
-                <WaifuComp v-for="w in userWaifus" v-on:click="clickOnWaifu(w)" :waifu="w" :class="selectionB[w.id]"/>
-            </div>
+
+        <div class="selection-grid waifu-grid">
+            <WaifuComp
+                v-for="waifu in userWaifus"
+                :key="waifu.id"
+                :waifu="waifu"
+                :class="{ 'is-selected': selectedWaifu == waifu }"
+                v-on:click="clickOnWaifu(waifu)"
+            />
         </div>
-    </div>
-    <div v-else>
-        <h1>Chargement...</h1>
-    </div>
+    </section>
+
+    <section v-else class="selection-panel">
+        <p class="eyebrow">Summoning room</p>
+        <h2>Loading waifus...</h2>
+    </section>
 </template>
-
-

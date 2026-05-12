@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { NavigationHandler } from '@/tools/navigationHandler';
-import { EncounterState, HeroTakeDamageStatus, type ExpeditionDB, type User } from '@/tools/types';
-import { formatTextTimeFromTimeMS, getEncounterStateString, getStringFromFAD } from '@/tools/utils';
-import { inject, ref } from 'vue';
+    import type { NavigationHandler } from '@/tools/navigationHandler'
+    import { EncounterState } from '@/tools/types'
+    import { getEncounterStateString, getStringFromFAD } from '@/tools/utils'
+    import { inject } from 'vue'
 
-    
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     const report = navigationHandler.getReport()
-    const reportJson = JSON.stringify(report)
+
     async function onclick() {
         await navigationHandler.setGameState(EncounterState.Home)
         await navigationHandler.fetchTeam()
@@ -16,28 +15,55 @@ import { inject, ref } from 'vue';
 </script>
 
 <template>
-    <div>
-        <h1>report</h1>
-        <div v-for="evR in report.whatHappened">
-            <h2>{{ getEncounterStateString(evR.stepState) }}</h2>
-            <div v-for="truc in evR.timeline">
-                <div class="row">
+    <section v-if="report" class="report-screen">
+        <section class="panel panel-feature report-summary">
+            <div>
+                <p class="eyebrow">Mission log</p>
+                <h2>{{ report.identifier }}</h2>
+                <p>Review the flow of the expedition, from travel beats to combat events, before heading back to the guild hall.</p>
+            </div>
+
+            <div class="report-summary-actions">
+                <div class="stat-pill">
+                    <span>Started</span>
+                    <strong>{{ new Date(report.startedAt).toLocaleString() }}</strong>
+                </div>
+                <div class="stat-pill">
+                    <span>XP reward</span>
+                    <strong>{{ report.ExpeditionRewards.xp }}</strong>
+                </div>
+                <button class="primary-button" v-on:click="onclick()">Return home</button>
+            </div>
+        </section>
+
+        <div class="report-timeline">
+            <article v-for="(eventReport, eventIndex) in report.whatHappened" :key="eventIndex" class="panel report-section">
+                <div class="panel-heading">
                     <div>
-                        {{  new Date(truc.when).toLocaleString() }} :
+                        <p class="eyebrow">Encounter phase</p>
+                        <h3>{{ getEncounterStateString(eventReport.stepState) }}</h3>
                     </div>
-                    <div class="column">
-                        <div>
-                        {{ truc.what }}
-                        </div>
-                        <div v-if="truc.whatAction">
-                            <div v-for="txt in getStringFromFAD(truc.whatAction)">
-                                {{ txt }}
+                </div>
+
+                <div class="report-events">
+                    <div v-for="(entry, entryIndex) in eventReport.timeline" :key="entryIndex" class="report-event">
+                        <div class="report-event-time">{{ new Date(entry.when).toLocaleString() }}</div>
+
+                        <div class="report-event-copy">
+                            <strong>{{ entry.what }}</strong>
+
+                            <div v-if="entry.whatAction">
+                                <p v-for="(txt, txtIndex) in getStringFromFAD(entry.whatAction)" :key="txtIndex">{{ txt }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </article>
         </div>
-        <button v-on:click="onclick()">ok</button>
-    </div>
+    </section>
+
+    <section v-else class="panel report-summary">
+        <p class="eyebrow">Mission log</p>
+        <h2>Loading report...</h2>
+    </section>
 </template>

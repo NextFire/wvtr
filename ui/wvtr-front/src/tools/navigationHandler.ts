@@ -1,7 +1,7 @@
 import { inject, ref, type Ref } from "vue"
 import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type ExpToGetFromBack, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
 import type { VueCookies } from "vue-cookies";
-import { buildRequestPath, fetchData, global, postRequest, RequestType } from "./utils";
+import { buildRequestPath, clampToRange, fetchData, global, postRequest, RequestType } from "./utils";
 
 enum NavigationStatus {
     Connexion = 1,
@@ -12,7 +12,7 @@ enum NavigationStatus {
     InspectHero,
 }
 
-// connexion handling 
+// connexion handling
 const authUrl = ref<string | undefined>(undefined)
 const cookieKey = 'wvtrusrid'
 //const $cookies = inject<VueCookies>('$cookies');
@@ -151,8 +151,13 @@ class NavigationHandler {
     async createAHeroFromAWaifu(waifu: Waifu) {
         const target = ref<Hero | undefined>(undefined)
         await postRequest<Hero, Waifu>(target, waifu, RequestType.CreateHeroFromWaifu, [{ id: "id", value: `${this.user.value!.id}` }])
-        this.user.value!.ownedHeroes.push(target.value!)
-        this.setHeroToInspect(target.value!)
+        if (!target.value) {
+            return
+        }
+
+        this.user.value!.ownedHeroes.push(target.value)
+        this.userWaifus.value = this.userWaifus.value?.filter((candidate) => candidate.id !== waifu.id)
+        this.setHeroToInspect(target.value)
         this.setHomeStatus(NavigationStatus.InspectHero)
     }
 
@@ -205,15 +210,15 @@ class NavigationHandler {
 
     /**
      * Setup the navigation handler with the cookies that contains the user id informations
-     * @param $cookies 
-     * @returns 
+     * @param $cookies
+     * @returns
      */
     async setup($cookies: VueCookies) {
         if ($cookies && isUserIdInRequestParams()) { // we got here only after authantification has been done
             let uidstring = getUserIdFromRequestParams()
             $cookies.set(cookieKey, uidstring, '30d', undefined, undefined, true, "Strict")
 
-            // redirect to the main page 
+            // redirect to the main page
             window.location.replace("/");
         } else if ($cookies && isUserIdInCookies($cookies)) { // client has been connected once, but we need to check if it matches the database
             await fetchData<User>(this.user, RequestType.User, [{ id: "id", value: `${getUserIdFromCookies($cookies)}` }])
@@ -231,10 +236,10 @@ class NavigationHandler {
 
     /**
      * Update the state of user team and oponent team state during expedition
-     * @param user 
-     * @param eri 
-     * @param now 
-     * @returns 
+     * @param user
+     * @param eri
+     * @param now
+     * @returns
      */
     applyTimelineEventToTeam(user: Ref<User | undefined>, eri: Ref<ExpeditionStepResolveInfo | undefined>, now: number) {
         if (!user.value?.currentTeam || !eri.value?.timeline || !eri.value.eTeam) {
@@ -267,11 +272,29 @@ class NavigationHandler {
         }
 
         for (let i = 0; i < user.value.currentTeam.heroes.length; i++) {
-            user.value.currentTeam.heroes[i]!.attributes.currentHP! = user.value.currentTeam.heroes[i]?.attributes.maxHP! + pvAccumulatorTeam[i]!
+            const hero = user.value.currentTeam.heroes[i]
+            if (!hero) {
+                continue
+            }
+
+            hero.attributes.currentHP = clampToRange(
+                hero.attributes.maxHP + pvAccumulatorTeam[i]!,
+                0,
+                hero.attributes.maxHP,
+            )
         }
 
         for (let i = 0; i < eri.value.eTeam!.heroes.length; i++) {
-            eri.value.eTeam.heroes[i]!.attributes.currentHP! = eri.value.eTeam.heroes[i]?.attributes.maxHP! + pvAccumulatorEn[i]!
+            const hero = eri.value.eTeam.heroes[i]
+            if (!hero) {
+                continue
+            }
+
+            hero.attributes.currentHP = clampToRange(
+                hero.attributes.maxHP + pvAccumulatorEn[i]!,
+                0,
+                hero.attributes.maxHP,
+            )
         }
     }
 
