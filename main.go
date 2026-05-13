@@ -407,9 +407,6 @@ func main() {
 	http.HandleFunc("/api/saveUser/", handlerSaveUser)
 	http.HandleFunc("/api/saveGameState/", handlerSaveGameState)
 
-	// Images handler
-	http.Handle("/imgs/", http.StripPrefix("/imgs/", http.FileServer(http.Dir("imgs/"))))
-
 	logger.DumpLog.Println("Listening on :4210...")
 	err := http.ListenAndServe(":4210", nil)
 
