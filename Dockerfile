@@ -13,7 +13,6 @@ WORKDIR /app
 COPY --from=builder-server /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder-server /src/wvtrserv .
 COPY --from=builder-web /src/dist ui/wvtr-front/dist
-COPY imgs imgs
 ENTRYPOINT [ "/app/wvtrserv" ]
 VOLUME [ "/app/db", "/app/tmp/logs" ]
 EXPOSE 4210
