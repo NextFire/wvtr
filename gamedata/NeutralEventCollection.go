@@ -66,3 +66,17 @@ func workEventFactory(duration time.Duration, quantity float64) expedition.Exped
 }
 
 var workShort expedition.ExpeditionEvent = workEventFactory(10*time.Second, 5)
+
+// Crafting
+func craftEventFactory(duration time.Duration, bases *expedition.RewardPool, proba float64) expedition.ExpeditionEvent {
+	res := expedition.NewNeutralEvent(duration, "Crafting",
+		bases,
+		expedition.HappeningType(func(selfEvent expedition.ExpeditionEvent, t *data.Team, e *data.ExpeditionStepResolveInfo) {
+			e.AddNewHappening(time.Now().Add(duration-2*time.Millisecond), "Crafted", nil)
+		}))
+
+	res.EEvent.Reward.LootChance = proba
+	return res
+}
+
+var craftWeapon1 expedition.ExpeditionEvent = craftEventFactory(3*time.Second, craftRewardPool, 1)

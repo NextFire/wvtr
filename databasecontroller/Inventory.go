@@ -31,12 +31,15 @@ func GetInventoryByID(id uint) *data.Inventory {
 
 func SaveInventory(inv *data.Inventory) {
 	for _, w := range inv.Weapons {
+		w.InventoryID = inv.ID
 		SaveWeapon(w)
 	}
 	for _, a := range inv.Armors {
+		a.InventoryID = inv.ID
 		SaveArmor(a)
 	}
 	for _, o := range inv.Omamoris {
+		o.InventoryID = inv.ID
 		SaveOmamori(o)
 	}
 	for _, c := range inv.Currencies {

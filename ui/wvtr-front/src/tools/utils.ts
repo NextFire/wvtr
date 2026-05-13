@@ -17,7 +17,7 @@ class global {
 
 
     //request update objects
-    public static readonly REQ_LAUNCHEXPEDITION = "/api/launchExpedition/{usr}/{expId}";
+    public static readonly REQ_LAUNCHEXPEDITION = "/api/launchExpedition/{usr}/{expCat}/{expId}";
     public static readonly REQ_UPDATETEAM = "/api/updateTeam/";
     public static readonly REQ_SAVEUSER = "/api/saveUser/";
     public static readonly REQ_SAVEGAMESTATE = "/api/saveGameState/";
@@ -149,19 +149,6 @@ async function getCurrentExpeditionStepResolveInfo(answer: Ref<ExpeditionStepRes
     await postRequest<ExpeditionStepResolveInfo, CurrentStepRequestMessage>(answer, message, RequestType.CurrentExpeditionStep)
 }
 
-async function launchExpedition(target: Ref<ExpeditionStepResolveInfo | undefined>, user: User, expIdentifier: string) {
-    target.value = undefined
-    let request: string = buildRequestPath(RequestType.LaunchExpedition)
-    request = request.replace(`{usr}`, String(user.id))
-    request = request.replace(`{expId}`, expIdentifier)
-    const response = await fetch(request);
-    target.value = await response.json() as ExpeditionStepResolveInfo
-    console.log(target.value)
-    if (target.value) {
-        user.state.state = target.value.stepState
-    }
-}
-
 async function createAHeroFromAWaifu(target: Ref<Hero | undefined>, waifu: Waifu, user: User) {
     console.log(waifu)
     postRequest<Hero, Waifu>(target, waifu, RequestType.CreateHeroFromWaifu, [{ id: "id", value: `${user.id}` }])
@@ -248,7 +235,6 @@ export {
     global,
     fetchData,
     postRequest,
-    launchExpedition,
     getCurrentExpeditionStepResolveInfo,
     getEncounterStateString,
     formatTextTimeFromTimeMS,

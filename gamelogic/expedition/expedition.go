@@ -6,12 +6,14 @@ import (
 )
 
 type ExpToSendToFront struct {
+	Category      string        `json:"category"`
 	Key           string        `json:"key"`
 	ImgURL        string        `json:"imgURL"`
 	Duration      time.Duration `json:"duration"`
 	CostName      string        `json:"costName"`
 	CostNumber    int           `json:"costNumber"`
 	CanBeLaunched bool          `json:"canBeLaunched"`
+	Order         int           `json:"order"`
 }
 
 type Expedition struct {
@@ -21,6 +23,7 @@ type Expedition struct {
 	Cost       data.IStorable
 	CostNumber int
 	Events     []ExpeditionEvent
+	Order      int
 }
 
 func (e *Expedition) CanEnter(user *data.User) bool {

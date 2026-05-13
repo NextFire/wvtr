@@ -342,10 +342,11 @@ func handlerLaunchExpedition(w http.ResponseWriter, r *http.Request) {
 	logger.DumpLog.Printf("%s call for API hadler\n", functionS)
 
 	id := utils.GetParamInt("usr", r)
+	expCathegory := r.PathValue("expCat")
 	expIdentifier := r.PathValue("expId")
 
 	user := databasecontroller.GetUserByID(uint(id))
-	var exp expedition.Expedition = gamedata.Expeditions[expIdentifier].GetCopy()
+	var exp expedition.Expedition = gamedata.Expeditions[expCathegory][expIdentifier].GetCopy()
 	if exp.CanEnter(user) && user.Inventory.Remove(exp.Cost, exp.CostNumber) {
 		databasecontroller.SaveInventory(user.Inventory)
 		c := data.NewCurrencyOwned(databasecontroller.GetAllCurrencies())
@@ -366,9 +367,9 @@ func handlerExpeditionReport(w http.ResponseWriter, r *http.Request) {
 	user := databasecontroller.GetUserByID(uint(id))
 	exp := user.State.CurrentExpedition
 	user.GetReward(exp.ExpeditionRewards)
+	databasecontroller.SaveInventory(user.Inventory)
 	databasecontroller.UpdateUser(user)
 	databasecontroller.SaveTeam(user.CurrentTeam)
-	databasecontroller.SaveInventory(user.Inventory)
 	utils.Give(user.State.CurrentExpedition, w, true)
 }
 
@@ -399,8 +400,13 @@ func main() {
 
 	//Modify db
 	//get
+<<<<<<< HEAD
 	http.HandleFunc("/api/launchExpedition/{usr}/{expId}", handlerLaunchExpedition)
 	http.HandleFunc("/api/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
+=======
+	http.HandleFunc("/launchExpedition/{usr}/{expCat}/{expId}", handlerLaunchExpedition)
+	http.HandleFunc("/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
+>>>>>>> aa34db0 (Add expedition catégories)
 
 	//post
 	http.HandleFunc("/api/updateTeam/", handlerUpdateTeam)

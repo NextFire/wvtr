@@ -186,15 +186,6 @@ type ExpeditionStepResolveInfo = {
     eTeam: Team | null
 }
 
-type ExpToGetFromBack = {
-    key: string,
-    imgURL: string,
-    duration: number,
-    costName: string,
-    costNumber: number,
-    canBeLaunched: boolean,
-}
-
 type ExpeditionDB = {
     identifier: string,
     startedAt: string,
@@ -268,6 +259,8 @@ type Waifu = {
     rank: string,
 }
 
+
+
 export type {
     Hero,
     Team,
@@ -279,7 +272,6 @@ export type {
     ExpeditionDB,
     Waifu,
     FieldActionDesc,
-    ExpToGetFromBack,
     Inventory,
 };
 

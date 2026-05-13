@@ -1,7 +1,8 @@
 import { inject, ref, type Ref } from "vue"
-import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type ExpToGetFromBack, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
+import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
 import type { VueCookies } from "vue-cookies";
 import { buildRequestPath, fetchData, global, postRequest, RequestType } from "./utils";
+import { buildExpeditionsCathegory, type ExpeditionCategory, type ExpToGetFromBack } from "./expeditions";
 
 enum NavigationStatus {
     Connexion = 1,
@@ -13,9 +14,7 @@ enum NavigationStatus {
 }
 
 // connexion handling 
-const authUrl = ref<string | undefined>(undefined)
 const cookieKey = 'wvtrusrid'
-//const $cookies = inject<VueCookies>('$cookies');
 
 function isUserIdInRequestParams(): boolean {
     let urlParams = new URLSearchParams(window.location.search);
@@ -73,7 +72,8 @@ class NavigationHandler {
 
     // the hendler is in charge of keeping it updated
     user = ref<User | undefined>(undefined)
-    availableExpedition = ref<ExpToGetFromBack[] | undefined>(undefined)
+    availableExpedition = ref<ExpeditionCategory[] | undefined>(undefined)
+    //availableExpedition = ref<ExpToGetFromBack[] | undefined>(undefined)
     userWaifus = ref<Waifu[] | undefined>(undefined)
     currentExpeditionStepResolveInfo = ref<ExpeditionStepResolveInfo | undefined>(undefined)
 
@@ -82,7 +82,9 @@ class NavigationHandler {
     }
 
     async fetchAvailableExpedition() {
-        await fetchData<ExpToGetFromBack[]>(this.availableExpedition, RequestType.AvailableExpeditions, [{ id: "id", value: `${this.user.value!.id}` }])
+        let exps = ref<ExpToGetFromBack[] | undefined>(undefined)
+        await fetchData<ExpToGetFromBack[]>(exps, RequestType.AvailableExpeditions, [{ id: "id", value: `${this.user.value!.id}` }])
+        this.availableExpedition.value = buildExpeditionsCathegory(exps.value!)
     }
 
     async fetchCurrentExpeditionStepResolveInfo(usreid: number) {
@@ -135,11 +137,12 @@ class NavigationHandler {
         return this.currentExpeditionStepResolveInfo
     }
 
-    async launchExpedition(target: Ref<ExpeditionStepResolveInfo | undefined>, expId: string) {
+    async launchExpedition(target: Ref<ExpeditionStepResolveInfo | undefined>, expCategory: string, expIdentifier: string) {
         target.value = undefined
         let request: string = buildRequestPath(RequestType.LaunchExpedition)
         request = request.replace(`{usr}`, String(this.user.value!.id))
-        request = request.replace(`{expId}`, expId)
+        request = request.replace(`{expCat}`, expCategory)
+        request = request.replace(`{expId}`, expIdentifier)
         const response = await fetch(request);
         await this.fetchInventory()
         target.value = await response.json() as ExpeditionStepResolveInfo
