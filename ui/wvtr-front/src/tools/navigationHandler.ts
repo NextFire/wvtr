@@ -1,5 +1,5 @@
 import { inject, ref, type Ref } from "vue"
-import { EncounterState, type CurrentStepRequestMessage, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
+import { EncounterState, type CurrentStepRequestMessage, type EquipmentType, type ExpeditionDB, type ExpeditionStepResolveInfo, type ExpeditionStepTimestamp, type GameState, type Hero, type Inventory, type Team, type User, type Waifu } from "./types"
 import type { VueCookies } from "vue-cookies";
 import { buildRequestPath, fetchData, global, postRequest, RequestType } from "./utils";
 import { buildExpeditionsCathegory, type ExpeditionCategory, type ExpToGetFromBack } from "./expeditions";
@@ -11,6 +11,7 @@ enum NavigationStatus {
     TeamManagement,
     HeroMaker,
     InspectHero,
+    Inventory,
 }
 
 // connexion handling 
@@ -77,6 +78,10 @@ class NavigationHandler {
     userWaifus = ref<Waifu[] | undefined>(undefined)
     currentExpeditionStepResolveInfo = ref<ExpeditionStepResolveInfo | undefined>(undefined)
 
+    // Equip hero
+    heroToEquip = ref<Hero | undefined>(undefined)
+    inventoryType = ref<EquipmentType | undefined>(undefined)
+
     constructor() {
         this.navigationStatus.value = NavigationStatus.Connexion
     }
@@ -119,6 +124,14 @@ class NavigationHandler {
         const report = ref<ExpeditionDB | undefined>(undefined)
         await fetchData<ExpeditionDB>(report, RequestType.ExpeditionReport, [{ id: "uid", value: `${this.user.value!.id}` }])
         this.user.value!.state.currentExpedition = report.value!
+    }
+
+    getHeroToEquip() {
+        return this.heroToEquip
+    }
+
+    getInventoryType() {
+        return this.inventoryType
     }
 
     getAvailableExpedition() {
@@ -195,6 +208,12 @@ class NavigationHandler {
 
     getUserCurrentTeam() {
         return this.user.value!.currentTeam
+    }
+
+    setInventoryVue(type: EquipmentType, heroToEquip: Hero) {
+        this.inventoryType.value = type
+        this.heroToEquip.value = heroToEquip
+        this.navigationStatus.value = NavigationStatus.Inventory
     }
 
     async setUserCurrentTeam(heroes: Hero[]) {

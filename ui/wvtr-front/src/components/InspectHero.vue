@@ -1,12 +1,18 @@
 <script setup lang="ts">
     import { inject } from "vue";
-import type { Hero } from "../tools/types.ts"
+import { EquipmentType, type Armor, type Hero, type Omamori, type Weapon } from "../tools/types.ts"
     import { global } from "../tools/utils.ts"
 import type { NavigationHandler } from "@/tools/navigationHandler.ts";
 
     const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     const hero = navigationHandler.getHeroToInspect()
+    const user = navigationHandler.getUser()
     console.log(hero.value)
+
+    function clickEquiment(type: EquipmentType) {
+        navigationHandler.setInventoryVue(type, hero.value!)
+    }
+
 </script>
 
 <template>
@@ -66,11 +72,31 @@ import type { NavigationHandler } from "@/tools/navigationHandler.ts";
                 <div class="raw">
                     <div v-if="hero.uniqueSkill" class="column">
                         <label>{{ hero.uniqueSkill.name }}</label>
-                        <img v-if="hero.uniqueSkill.image_url !== ''" :src="hero.uniqueSkill.image_url"/>
+                        <img v-if="hero.uniqueSkill.image_url !== ''" :src="hero.uniqueSkill.image_url" width="75"/>
                     </div>
                     <div v-if="hero.activeSkill" class="column">
                         <label>{{ hero.activeSkill.name }}</label>
                         <img v-if="hero.activeSkill.image_url !== ''" :src="hero.activeSkill.image_url"/>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <label>Equipment</label>
+                <div class="raw">
+                    <div class="column">
+                        <label>Weapon</label>
+                        <img v-if="hero.equipment.weapon" v-on:click="clickEquiment(EquipmentType.WeaponType)" width="75" :src="hero.equipment.weapon?.iconURL"/>
+                        <img v-else v-on:click="clickEquiment(EquipmentType.WeaponType)" width="75" :src="global.NO_EQUIPMENT"/>
+                    </div>
+                    <div class="column">
+                        <label>Armor</label>
+                        <img v-if="hero.equipment.armor" v-on:click="clickEquiment(EquipmentType.ArmorType)" width="75" :src="hero.equipment.armor?.iconURL"/>
+                        <img v-else v-on:click="clickEquiment(EquipmentType.ArmorType)" width="75" :src="global.NO_EQUIPMENT"/>
+                    </div>
+                    <div class="column">
+                        <label>Omamori</label>
+                        <img v-if="hero.equipment.omamori" v-on:click="clickEquiment(EquipmentType.OmamoriType)" width="75" :src="hero.equipment.omamori?.iconURL"/>
+                        <img v-else v-on:click="clickEquiment(EquipmentType.OmamoriType)" width="75" :src="global.NO_EQUIPMENT"/>
                     </div>
                 </div>
             </div>

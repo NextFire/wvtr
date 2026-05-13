@@ -7,6 +7,7 @@
     import Waifus from "./Waifus.vue"
     import InspectHero from "./InspectHero.vue"
     import { NavigationStatus, NavigationHandler } from "@/tools/navigationHandler.ts"
+import InventoryComp from "./Inventory.vue"
 
         const navigationHandler = inject<NavigationHandler>('navigationHandler')!
     const user = navigationHandler.getUser()
@@ -36,6 +37,7 @@
         <ExpeditionsList v-else-if="navigationHandler.getNavigationStatus().value == NavigationStatus.ExpeditionManagement"/>
         <Waifus v-else-if="navigationHandler.getNavigationStatus().value == NavigationStatus.HeroMaker"/>
         <InspectHero v-else-if="navigationHandler.getNavigationStatus().value == NavigationStatus.InspectHero"/>
+        <InventoryComp v-else-if="navigationHandler.getNavigationStatus().value == NavigationStatus.Inventory"/>
     <!-- </div> -->
 </template>
 

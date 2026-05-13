@@ -303,7 +303,6 @@ func handlerUpdateTeam(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	utils.Give(user.CurrentTeam, w, true)
-
 }
 
 type CurrentStepRequestMessage struct {
@@ -400,13 +399,8 @@ func main() {
 
 	//Modify db
 	//get
-<<<<<<< HEAD
-	http.HandleFunc("/api/launchExpedition/{usr}/{expId}", handlerLaunchExpedition)
+	http.HandleFunc("/api/launchExpedition/{usr}/{expCat}/{expId}", handlerLaunchExpedition)
 	http.HandleFunc("/api/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
-=======
-	http.HandleFunc("/launchExpedition/{usr}/{expCat}/{expId}", handlerLaunchExpedition)
-	http.HandleFunc("/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
->>>>>>> aa34db0 (Add expedition catégories)
 
 	//post
 	http.HandleFunc("/api/updateTeam/", handlerUpdateTeam)

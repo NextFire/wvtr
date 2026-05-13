@@ -50,6 +50,12 @@ enum CurrencyType {
     CScrap,
 }
 
+enum EquipmentType {
+    WeaponType = 0,
+    ArmorType,
+    OmamoriType,
+}
+
 type Damage = {
     slashDmg: number,
     bluntDmg: number,
@@ -73,6 +79,7 @@ type Affix = {
 
 type Storable = {
     name: string,
+    iconURL: string,
 }
 
 type Currency = {
@@ -273,10 +280,15 @@ export type {
     Waifu,
     FieldActionDesc,
     Inventory,
+    Equipable,
+    Weapon,
+    Armor,
+    Omamori,
 };
 
 export {
     EncounterState,
     HeroTakeDamageStatus,
+    EquipmentType,
 }
 

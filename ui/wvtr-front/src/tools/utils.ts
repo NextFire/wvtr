@@ -29,6 +29,7 @@ class global {
     public static readonly REQ_USERWAIFUS = "/api/userwaifus/{id}"
 
     public static readonly NO_IMAGE = "/imgs/noimage.jpg";
+    public static readonly NO_EQUIPMENT = "/imgs/equipments/nothing_icon.png"
     public static readonly EXPEDITION = "/imgs/expedition.png";
 }
 
