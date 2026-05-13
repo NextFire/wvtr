@@ -7,26 +7,26 @@ class global {
     public static readonly REQ_AUTH = "/api/oidc/auth";
 
     //Request object by id
-    public static readonly REQ_HERO = "/hero/{id}";
-    public static readonly REQ_TEAM = "/teams/{id}";
-    public static readonly REQ_INVENTORY = "/inventory/{id}";
-    public static readonly REQ_EXPEDITIONREPORT = "/expeditionReport/{uid}";
-    public static readonly REQ_USR = "/user/{id}";
-    public static readonly REQ_AVAILABLEEXPEDITIONS = "/availableexpeditions/{id}"
-    public static readonly REQ_CURRENTEXPEDITIONSTEP = "/currentexpeditionstep/";
+    public static readonly REQ_HERO = "/api/hero/{id}";
+    public static readonly REQ_TEAM = "/api/teams/{id}";
+    public static readonly REQ_INVENTORY = "/api/inventory/{id}";
+    public static readonly REQ_EXPEDITIONREPORT = "/api/expeditionReport/{uid}";
+    public static readonly REQ_USR = "/api/user/{id}";
+    public static readonly REQ_AVAILABLEEXPEDITIONS = "/api/availableexpeditions/{id}"
+    public static readonly REQ_CURRENTEXPEDITIONSTEP = "/api/currentexpeditionstep/";
 
 
     //request update objects
-    public static readonly REQ_LAUNCHEXPEDITION = "/launchExpedition/{usr}/{expId}";
-    public static readonly REQ_UPDATETEAM = "/updateTeam/";
-    public static readonly REQ_SAVEUSER = "/saveUser/";
-    public static readonly REQ_SAVEGAMESTATE = "/saveGameState/";
+    public static readonly REQ_LAUNCHEXPEDITION = "/api/launchExpedition/{usr}/{expId}";
+    public static readonly REQ_UPDATETEAM = "/api/updateTeam/";
+    public static readonly REQ_SAVEUSER = "/api/saveUser/";
+    public static readonly REQ_SAVEGAMESTATE = "/api/saveGameState/";
 
     //Create objects
-    public static readonly REQ_CREATEHEROFROMWAIFU = "/createherofromwaifu/{id}"
+    public static readonly REQ_CREATEHEROFROMWAIFU = "/api/createherofromwaifu/{id}"
 
-    //nanapi requests 
-    public static readonly REQ_USERWAIFUS = "/userwaifus/{id}"
+    //nanapi requests
+    public static readonly REQ_USERWAIFUS = "/api/userwaifus/{id}"
 
     public static readonly NO_IMAGE = "/imgs/noimage.jpg";
     public static readonly EXPEDITION = "/imgs/expedition.png";

@@ -386,26 +386,26 @@ func main() {
 
 	// Request object by ID.
 	//get
-	http.HandleFunc("/hero/{id}", handlerHero)
-	http.HandleFunc("/teams/{id}", handlerTeam)
-	http.HandleFunc("/inventory/{id}", handlerInventory)
-	http.HandleFunc("/expeditionReport/{uid}", handlerExpeditionReport)
-	http.HandleFunc("/user/{id}", handlerUser)
-	http.HandleFunc("/availableexpeditions/{id}", handlerAvailableExpeditions)
-	http.HandleFunc("/userwaifus/{id}", handleGetPlayerWaicolleAscendedWaifus)
+	http.HandleFunc("/api/hero/{id}", handlerHero)
+	http.HandleFunc("/api/teams/{id}", handlerTeam)
+	http.HandleFunc("/api/inventory/{id}", handlerInventory)
+	http.HandleFunc("/api/expeditionReport/{uid}", handlerExpeditionReport)
+	http.HandleFunc("/api/user/{id}", handlerUser)
+	http.HandleFunc("/api/availableexpeditions/{id}", handlerAvailableExpeditions)
+	http.HandleFunc("/api/userwaifus/{id}", handleGetPlayerWaicolleAscendedWaifus)
 
 	//post
-	http.HandleFunc("/currentexpeditionstep/", handlerCurrentExpeditionStep)
+	http.HandleFunc("/api/currentexpeditionstep/", handlerCurrentExpeditionStep)
 
 	//Modify db
 	//get
-	http.HandleFunc("/launchExpedition/{usr}/{expId}", handlerLaunchExpedition)
-	http.HandleFunc("/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
+	http.HandleFunc("/api/launchExpedition/{usr}/{expId}", handlerLaunchExpedition)
+	http.HandleFunc("/api/createherofromwaifu/{id}", handlerCreateHeroForPlayer)
 
 	//post
-	http.HandleFunc("/updateTeam/", handlerUpdateTeam)
-	http.HandleFunc("/saveUser/", handlerSaveUser)
-	http.HandleFunc("/saveGameState/", handlerSaveGameState)
+	http.HandleFunc("/api/updateTeam/", handlerUpdateTeam)
+	http.HandleFunc("/api/saveUser/", handlerSaveUser)
+	http.HandleFunc("/api/saveGameState/", handlerSaveGameState)
 
 	// Images handler
 	http.Handle("/imgs/", http.StripPrefix("/imgs/", http.FileServer(http.Dir("imgs/"))))
